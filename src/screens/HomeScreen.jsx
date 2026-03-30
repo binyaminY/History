@@ -3,7 +3,6 @@ import T from "../constants/theme";
 import TX from "../constants/translations";
 import EVENTS, { LEVEL_ORDER } from "../constants/events";
 import SectionLabel from "../components/SectionLabel";
-import LevelBadge from "../components/LevelBadge";
 import Spinner from "../components/Spinner";
 import { callClaude } from "../api/claude";
 
@@ -184,7 +183,6 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
             }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:5 }}>
                 <div style={{ fontSize:".67rem", color:T.goldDim, fontWeight:600, letterSpacing:".08em", textTransform:"uppercase" }}>{e.era}</div>
-                <LevelBadge level={e.level} />
               </div>
               <div style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:".94rem", marginBottom:5, lineHeight:1.35 }}>{e.name}</div>
               <div style={{ fontSize:".74rem", color:T.textMuted }}>📅 {e.year}</div>

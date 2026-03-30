@@ -1,7 +1,6 @@
 import { useState } from "react";
 import T from "../constants/theme";
 import TX from "../constants/translations";
-import LevelBadge from "./LevelBadge";
 import Btn from "./Btn";
 import Spinner from "./Spinner";
 import { callClaude } from "../api/claude";
@@ -54,7 +53,6 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
             <div style={{ flex:1 }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8, flexWrap:"wrap" }}>
                 <span style={{ fontSize:".68rem", color:T.gold, fontWeight:600, letterSpacing:".12em", textTransform:"uppercase", background:"rgba(201,168,76,.1)", padding:"3px 10px", borderRadius:20, border:`1px solid ${T.borderStrong}` }}>{e.era}</span>
-                <LevelBadge level={e.level} />
                 {e.tags.map(tag => (
                   <span key={tag} style={{ fontSize:".62rem", padding:"2px 8px", borderRadius:20, background:T.surface3, color:T.textMuted, border:`1px solid ${T.border}` }}>{tag}</span>
                 ))}
