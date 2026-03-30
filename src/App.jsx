@@ -9,6 +9,7 @@ import ChatScreen from "./screens/ChatScreen";
 import SavedScreen from "./screens/SavedScreen";
 import QuizScreen from "./screens/QuizScreen";
 import BackgroundArt from "./components/BackgroundArt";
+import ContactModal from "./components/ContactModal";
 
 export default function App() {
   const [lang, setLang] = useState("he");
@@ -20,6 +21,7 @@ export default function App() {
   const [toast, setToast] = useState("");
   const [modal, setModal] = useState(null);
   const [chatInitQ, setChatInitQ] = useState(null);
+  const [contactOpen, setContactOpen] = useState(false);
 
   const isHe = lang === "he";
   const tx = TX[lang];
@@ -103,6 +105,10 @@ export default function App() {
           ))}
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <button onClick={() => setContactOpen(true)} style={{
+            background:T.surface2, border:`1px solid ${T.border}`, borderRadius:20,
+            padding:"5px 13px", fontSize:".79rem", color:T.textDim, cursor:"pointer", fontFamily:"inherit",
+          }}>{isHe ? "✉️ צור קשר" : "✉️ Contact"}</button>
           <button onClick={() => setLang(l => l==="he"?"en":"he")} style={{
             background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20,
             padding:"5px 13px", fontSize:".79rem", color:T.gold, cursor:"pointer", fontFamily:"inherit",
@@ -126,6 +132,8 @@ export default function App() {
           onAsk={() => openEventAndGoChat(modal)}
         />
       )}
+
+      {contactOpen && <ContactModal isHe={isHe} onClose={() => setContactOpen(false)} />}
 
       {toast && <div style={{
         position:"fixed", bottom:90, left:"50%", transform:"translateX(-50%)",
