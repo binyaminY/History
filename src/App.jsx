@@ -12,7 +12,7 @@ import BackgroundArt from "./components/BackgroundArt";
 
 export default function App() {
   const [lang, setLang] = useState("he");
-  const [level, setLevel] = useState("intermediate");
+  const level = "beginner";
   const [screen, setScreen] = useState("home");
   const [saved, setSaved] = useState(() => {
     try { return JSON.parse(localStorage.getItem("hm_react_saved") || "[]"); } catch { return []; }
@@ -57,12 +57,6 @@ export default function App() {
     { id:"chat", label:tx.navChat },
     { id:"saved", label:tx.navSaved },
     { id:"quiz", label:tx.navQuiz },
-  ];
-
-  const levels = [
-    { v:"beginner", l:tx.levelBeginner },
-    { v:"intermediate", l:tx.levelIntermediate },
-    { v:"advanced", l:tx.levelAdvanced },
   ];
 
   const modalEvent = modal ? events.find(e => e.id === modal) : null;
@@ -113,14 +107,6 @@ export default function App() {
             background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20,
             padding:"5px 13px", fontSize:".79rem", color:T.gold, cursor:"pointer", fontFamily:"inherit",
           }}>{tx.langToggle}</button>
-          <div style={{ display:"flex", alignItems:"center", gap:7, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:20, padding:"5px 11px" }}>
-            <div style={{ width:7, height:7, borderRadius:"50%", background:T.gold, flexShrink:0 }} />
-            <select value={level} onChange={e => setLevel(e.target.value)} style={{
-              background:"transparent", border:"none", color:T.textDim, fontSize:"16px", cursor:"pointer", outline:"none", fontFamily:"inherit",
-            }}>
-              {levels.map(l => <option key={l.v} value={l.v}>{l.l}</option>)}
-            </select>
-          </div>
         </div>
       </nav>
 

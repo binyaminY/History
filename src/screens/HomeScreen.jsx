@@ -110,13 +110,13 @@ function DailyEvent({ lang, isHe, onOpenEvent }) {
               background:"transparent", border:`1px solid ${T.borderStrong}`, borderRadius:7,
               color: idx === 0 ? T.textMuted : T.gold, cursor: idx === 0 ? "default" : "pointer",
               padding:"3px 9px", fontSize:".85rem", lineHeight:1,
-            }}>{isHe ? "›" : "‹"}</button>
+            }}>‹</button>
             <span style={{ fontSize:".72rem", color:T.textMuted }}>{idx + 1} / {events.length}</span>
             <button onClick={() => setIdx(i => Math.min(events.length - 1, i + 1))} disabled={idx === events.length - 1} style={{
               background:"transparent", border:`1px solid ${T.borderStrong}`, borderRadius:7,
               color: idx === events.length - 1 ? T.textMuted : T.gold, cursor: idx === events.length - 1 ? "default" : "pointer",
               padding:"3px 9px", fontSize:".85rem", lineHeight:1,
-            }}>{isHe ? "‹" : "›"}</button>
+            }}>›</button>
           </div>
         )}
       </div>
@@ -168,7 +168,7 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
         </h1>
         <p style={{ color:T.textDim, fontSize:".9rem", maxWidth:460, margin:"0 auto 0", lineHeight:1.7 }}>{tx.heroSub}</p>
         <p style={{ color:T.textDim, fontSize:".88rem", marginTop:16 }}>
-          האפליקציה נוסדה על ידי בנימין יונה וחברו העיראקי היקר מר אלעד יחיא
+          האפליקציה נוסדה על ידי בנימין יונה
         </p>
       </div>
 
