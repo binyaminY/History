@@ -167,7 +167,7 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
           {tx.heroTitle}<br /><em style={{ color:T.gold }}>{tx.heroTitleEm}</em>
         </h1>
         <p style={{ color:T.textDim, fontSize:".9rem", maxWidth:460, margin:"0 auto 0", lineHeight:1.7 }}>{tx.heroSub}</p>
-        <p style={{ color:T.textMuted, fontSize:".72rem", marginTop:14, opacity:.7 }}>
+        <p style={{ color:T.textDim, fontSize:".88rem", marginTop:16 }}>
           האפליקציה נוסדה על ידי בנימין יונה וחברו העיראקי היקר מר אלעד יחיא
         </p>
       </div>

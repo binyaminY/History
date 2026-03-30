@@ -16,6 +16,23 @@ const ERA_COLORS = {
   "20th Century": "#c94c4c",
 };
 
+function extractSortYear(yearStr) {
+  const str = String(yearStr);
+  const isBCE = /לפנה"ס|BC/i.test(str);
+  // Prefer a 4-digit number (most years), then fall back to any number
+  const match = str.match(/\b(\d{4})\b/) || str.match(/\d+/);
+  if (!match) return 0;
+  const year = parseInt(match[1] ?? match[0]);
+  return isBCE ? -year : year;
+}
+
+const ERA_ORDER = {
+  // Hebrew
+  "עולם עתיק": 0, "ימי הביניים": 1, 'המאה ה-18': 2, "המאה ה-19": 3, "המאה ה-20": 4,
+  // English
+  "Ancient World": 0, "Middle Ages": 1, "18th Century": 2, "19th Century": 3, "20th Century": 4,
+};
+
 export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
   const [filter, setFilter] = useState("all");
   const isHe = lang === "he";
@@ -32,14 +49,18 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
   const currentLevelNum = LEVEL_ORDER[level] ?? 1;
   const items = [...events]
     .filter(e => (LEVEL_ORDER[e.level]??0) <= currentLevelNum && (filter==="all" || e.tags.includes(filter)))
-    .sort((a,b) => parseInt(a.year) - parseInt(b.year));
+    .sort((a,b) => extractSortYear(a.year) - extractSortYear(b.year));
 
-  // Group by era
+  // Group by era, preserving chronological era order
   const grouped = items.reduce((acc, e) => {
     if (!acc[e.era]) acc[e.era] = [];
     acc[e.era].push(e);
     return acc;
   }, {});
+
+  const sortedEras = Object.keys(grouped).sort(
+    (a, b) => (ERA_ORDER[a] ?? 99) - (ERA_ORDER[b] ?? 99)
+  );
 
   return (
     <div style={{ flex:1, overflowY:"auto", padding:"26px 28px" }}>
@@ -64,7 +85,7 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
         </div>
 
         {/* Timeline grouped by era */}
-        {Object.entries(grouped).map(([era, eraEvents]) => {
+        {sortedEras.map(era => { const eraEvents = grouped[era]; return (
           const eraColor = ERA_COLORS[era] || T.gold;
           return (
             <div key={era} style={{ marginBottom:40 }}>
@@ -142,8 +163,8 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
                 ))}
               </div>
             </div>
-          );
-        })}
+          ); })}
+
       </div>
     </div>
   );

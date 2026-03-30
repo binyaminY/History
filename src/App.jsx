@@ -8,6 +8,7 @@ import TimelineScreen from "./screens/TimelineScreen";
 import ChatScreen from "./screens/ChatScreen";
 import SavedScreen from "./screens/SavedScreen";
 import QuizScreen from "./screens/QuizScreen";
+import BackgroundArt from "./components/BackgroundArt";
 
 export default function App() {
   const [lang, setLang] = useState("he");
@@ -71,8 +72,9 @@ export default function App() {
       background:T.bg, color:T.text,
       fontFamily: isHe ? "'Comfortaa','Nunito',sans-serif" : "'Nunito','Comfortaa',sans-serif",
       minHeight:"100vh", display:"flex", flexDirection:"column",
-      direction: isHe ? "rtl" : "ltr",
+      direction: isHe ? "rtl" : "ltr", position:"relative",
     }}>
+      <BackgroundArt />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Nunito:wght@400;600;700;800;900&display=swap');
         @keyframes hm-spin { to { transform: rotate(360deg); } }
