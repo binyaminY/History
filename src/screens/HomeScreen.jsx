@@ -45,7 +45,7 @@ function DailyEvent({ lang, isHe, onOpenEvent }) {
     const day = today.getDate();
     const month = today.getMonth() + 1;
     const dateStr = `${day}/${month}`;
-    const cacheKey = `hm_daily_v3_${dateStr}_${lang}`;
+    const cacheKey = `hm_daily_v4_${dateStr}_${lang}`;
     const cached = (() => { try { return JSON.parse(localStorage.getItem(cacheKey)); } catch { return null; } })();
 
     if (cached && Array.isArray(cached) && cached.length > 0) {
@@ -57,11 +57,11 @@ function DailyEvent({ lang, isHe, onOpenEvent }) {
 
     callClaude(
       isHe
-        ? "You are a history expert. You MUST respond ONLY in Hebrew. Never use double-quote characters inside string values — use single quotes instead."
-        : "You are a history expert. Never use double-quote characters inside string values — use single quotes instead.",
+        ? "You are a precise history expert. You MUST respond ONLY in Hebrew. CRITICAL: Only include events that are historically confirmed to have occurred on the EXACT day and month specified. If you are not 100% certain an event occurred on that exact date, do not include it. Never use double-quote characters inside string values — use single quotes instead."
+        : "You are a precise history expert. CRITICAL: Only include events that are historically confirmed to have occurred on the EXACT day and month specified. If you are not 100% certain an event occurred on that exact date, do not include it. Never use double-quote characters inside string values — use single quotes instead.",
       isHe
-        ? `היום הוא ${day} ב${monthNamesHe[month-1]}. פרט 3 אירועים היסטוריים חשובים שקרו בתאריך זה בהיסטוריה העולמית. החזר JSON בלבד, ללא טקסט נוסף, בפורמט הבא:\n[\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." }\n]`
-        : `Today is ${monthNamesEn[month-1]} ${day}. List 3 important historical events that happened on this date in world history. Return JSON only, no extra text, in this format:\n[\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." }\n]`,
+        ? `היום הוא ${day} ב${monthNamesHe[month-1]}. ציין 3 אירועים היסטוריים שקרו בדיוק בתאריך ${day}/${month} (יום וחודש) בשנים שונות. חשוב מאוד: כל אירוע חייב להיות מאומת היסטורית שקרה בתאריך המדויק הזה — לא רק באותה שנה. אל תכלול אירועים שקרו בתאריכים אחרים. החזר JSON בלבד:\n[\n  { "title": "...", "year": "...", "summary": "2-3 משפטים", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "2-3 משפטים", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "2-3 משפטים", "significance": "..." }\n]`
+        : `Today is ${monthNamesEn[month-1]} ${day}. List 3 historical events that occurred on exactly ${monthNamesEn[month-1]} ${day} (this exact day and month) in different years. CRITICAL: Every event must be historically verified to have happened on this exact date — not just in that year. Do not include events that happened on other dates. Return JSON only:\n[\n  { "title": "...", "year": "...", "summary": "2-3 sentences", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "2-3 sentences", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "2-3 sentences", "significance": "..." }\n]`,
       1200
     ).then(raw => {
       const arr = parseJsonEvents(raw);
