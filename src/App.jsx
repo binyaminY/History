@@ -89,7 +89,7 @@ export default function App() {
         position:"sticky", top:0, zIndex:100, flexWrap:"wrap", gap:8,
       }}>
         <div style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"1.35rem", fontWeight:900, color:T.gold }}>
-          History<span style={{ color:T.text }}>Mind</span>
+          HistoryWith<span style={{ color:T.text }}>Ben</span>
         </div>
         <div style={{ display:"flex", gap:3, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:11, padding:3, flexWrap:"wrap", justifyContent:"center" }}>
           {navTabs.map(tab => (
