@@ -56,7 +56,7 @@ export default function ChatScreen({ lang, level, initialQuestion = null }) {
     .replace(/\n/g, "<br/>");
 
   return (
-    <div style={{ flex:1, display:"flex", flexDirection:"column", height:"calc(100vh - 60px)" }}>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", minHeight:0, overflow:"hidden" }}>
       <div style={{ flex:1, overflowY:"auto", padding:"20px 26px", display:"flex", flexDirection:"column", gap:13 }}>
         {messages.map((msg, i) => (
           <div key={i} style={{ maxWidth:640, alignSelf: msg.role==="user" ? (isHe?"flex-start":"flex-end") : (isHe?"flex-end":"flex-start") }}>
@@ -85,14 +85,14 @@ export default function ChatScreen({ lang, level, initialQuestion = null }) {
         ))}
         <div ref={endRef} />
       </div>
-      <div style={{ borderTop:`1px solid ${T.border}`, padding:"13px 20px", background:T.surface }}>
+      <div style={{ borderTop:`1px solid ${T.border}`, padding:"13px 20px", paddingBottom:"max(13px, calc(13px + env(safe-area-inset-bottom)))", paddingInlineStart:"max(20px, calc(20px + env(safe-area-inset-left)))", paddingInlineEnd:"max(20px, calc(20px + env(safe-area-inset-right)))", background:T.surface, flexShrink:0 }}>
         <div style={{ display:"flex", gap:8, alignItems:"center", background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"7px 10px", maxWidth:640, margin:"0 auto" }}>
-          <button onClick={() => send()} disabled={loading} style={{ background:T.gold, color:"#0c0a08", border:"none", borderRadius:8, width:32, height:32, cursor:"pointer", display:"grid", placeItems:"center", flexShrink:0, fontSize:".95rem" }}>➤</button>
+          <button onClick={() => send()} disabled={loading} style={{ background:T.gold, color:"#0c0a08", border:"none", borderRadius:8, width:40, height:40, minWidth:40, cursor:"pointer", display:"grid", placeItems:"center", flexShrink:0, fontSize:"1rem", order: isHe ? 1 : 0 }}>{isHe ? "◄" : "►"}</button>
           <textarea
             value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
             rows={1} placeholder={tx.chatPlaceholder}
-            style={{ flex:1, background:"transparent", border:"none", outline:"none", color:T.text, fontSize:".87rem", resize:"none", maxHeight:100, textAlign: isHe?"right":"left", fontFamily:"inherit" }}
+            style={{ flex:1, background:"transparent", border:"none", outline:"none", color:T.text, fontSize:"16px", resize:"none", maxHeight:100, textAlign: isHe?"right":"left", fontFamily:"inherit", minWidth:0 }}
           />
         </div>
       </div>

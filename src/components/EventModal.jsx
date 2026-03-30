@@ -109,7 +109,28 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
                   {isHe ? "ה-AI מכין סיכום מפורט..." : "AI is preparing detailed summary..."}
                 </div>
               ) : (
-                <div style={{ fontSize:".88rem", color:T.textDim, lineHeight:1.9, whiteSpace:"pre-wrap" }}>{deepInfo}</div>
+                <div style={{ fontSize:".88rem", color:T.textDim, lineHeight:1.9 }}>
+                  {deepInfo.split("\n").map((line, i) => {
+                    const trimmed = line.trim();
+                    if (!trimmed) return <div key={i} style={{ height: 8 }} />;
+                    // Bullet lines: start with * or -
+                    const isBullet = /^[*\-•]\s/.test(trimmed);
+                    const text = trimmed.replace(/^[*\-•]\s*/, "");
+                    // Bold: **text**
+                    const parts = text.split(/(\*\*[^*]+\*\*)/g).map((p, j) =>
+                      p.startsWith("**") && p.endsWith("**")
+                        ? <strong key={j} style={{ color: T.gold, fontWeight: 700 }}>{p.slice(2, -2)}</strong>
+                        : p
+                    );
+                    if (isBullet) return (
+                      <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start", marginBottom:6 }}>
+                        <span style={{ color:T.gold, fontWeight:700, flexShrink:0, marginTop:2 }}>›</span>
+                        <span>{parts}</span>
+                      </div>
+                    );
+                    return <p key={i} style={{ marginBottom:10 }}>{parts}</p>;
+                  })}
+                </div>
               )}
             </div>
           )}

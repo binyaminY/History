@@ -79,11 +79,16 @@ export default function App() {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,.35); border-radius: 3px; }
+        button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        input, textarea, select { font-size: 16px; }
       `}</style>
 
       <nav style={{
         display:"flex", alignItems:"center", justifyContent:"space-between",
-        padding:"13px 24px", borderBottom:`1px solid ${T.border}`,
+        padding:"13px 24px", paddingTop:"max(13px, calc(13px + env(safe-area-inset-top)))",
+        paddingInlineStart:"max(24px, calc(24px + env(safe-area-inset-left)))",
+        paddingInlineEnd:"max(24px, calc(24px + env(safe-area-inset-right)))",
+        borderBottom:`1px solid ${T.border}`,
         background:"rgba(12,10,8,.97)", backdropFilter:"blur(20px)",
         position:"sticky", top:0, zIndex:100, flexWrap:"wrap", gap:8,
       }}>
@@ -109,7 +114,7 @@ export default function App() {
           <div style={{ display:"flex", alignItems:"center", gap:7, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:20, padding:"5px 11px" }}>
             <div style={{ width:7, height:7, borderRadius:"50%", background:T.gold, flexShrink:0 }} />
             <select value={level} onChange={e => setLevel(e.target.value)} style={{
-              background:"transparent", border:"none", color:T.textDim, fontSize:".77rem", cursor:"pointer", outline:"none", fontFamily:"inherit",
+              background:"transparent", border:"none", color:T.textDim, fontSize:"16px", cursor:"pointer", outline:"none", fontFamily:"inherit",
             }}>
               {levels.map(l => <option key={l.v} value={l.v}>{l.l}</option>)}
             </select>

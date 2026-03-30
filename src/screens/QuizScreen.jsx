@@ -199,7 +199,7 @@ export default function QuizScreen({ lang, events, level }) {
                   <textarea
                     value={openInput} onChange={e => setOpenInput(e.target.value)}
                     rows={4} placeholder={tx.quizOpenPlaceholder}
-                    style={{ width:"100%", background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"14px 16px", color:T.text, fontFamily:"inherit", fontSize:".88rem", lineHeight:1.7, resize:"vertical", minHeight:100, outline:"none", textAlign: isHe?"right":"left" }}
+                    style={{ width:"100%", background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"14px 16px", color:T.text, fontFamily:"inherit", fontSize:"16px", lineHeight:1.7, resize:"vertical", minHeight:100, outline:"none", textAlign: isHe?"right":"left" }}
                   />
                   <Btn onClick={submitOpen} variant="generate" style={{ marginTop:12 }}>{tx.quizSubmit}</Btn>
                 </>

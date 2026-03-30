@@ -7,36 +7,73 @@ import LevelBadge from "../components/LevelBadge";
 import Spinner from "../components/Spinner";
 import { callClaude } from "../api/claude";
 
+function parseJsonEvents(raw) {
+  const clean = raw.replace(/```json|```/gi, "").trim();
+  // Try 1: find first '[' and parse array from there
+  const arrStart = clean.indexOf("[");
+  if (arrStart !== -1) {
+    try {
+      const parsed = JSON.parse(clean.slice(arrStart));
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch {}
+  }
+  // Try 2: parse the whole cleaned string
+  try {
+    const parsed = JSON.parse(clean);
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    if (parsed && parsed.title) return [parsed];
+  } catch {}
+  // Try 3: find first '{' and wrap as single event
+  const objStart = clean.indexOf("{");
+  const objEnd = clean.lastIndexOf("}");
+  if (objStart !== -1 && objEnd !== -1) {
+    try {
+      const parsed = JSON.parse(clean.slice(objStart, objEnd + 1));
+      if (parsed && parsed.title) return [parsed];
+    } catch {}
+  }
+  return null;
+}
+
 function DailyEvent({ lang, isHe, onOpenEvent }) {
-  const [daily, setDaily] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [idx, setIdx] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const today = new Date();
     const day = today.getDate();
     const month = today.getMonth() + 1;
     const dateStr = `${day}/${month}`;
-    const cacheKey = `hm_daily_${dateStr}_${lang}`;
+    const cacheKey = `hm_daily_v3_${dateStr}_${lang}`;
     const cached = (() => { try { return JSON.parse(localStorage.getItem(cacheKey)); } catch { return null; } })();
 
-    if (cached) { setDaily(cached); setLoading(false); return; }
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      setEvents(cached); setLoading(false); return;
+    }
+
+    const monthNamesHe = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+    const monthNamesEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
     callClaude(
       isHe
-        ? "You are a history expert. Respond ONLY in Hebrew. Do not use double quote characters inside text values."
-        : "You are a history expert. Do not use double quote characters inside text values.",
+        ? "You are a history expert. You MUST respond ONLY in Hebrew. Never use double-quote characters inside string values — use single quotes instead."
+        : "You are a history expert. Never use double-quote characters inside string values — use single quotes instead.",
       isHe
-        ? `היום הוא ${day} ב${["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"][month-1]}. ספר על אירוע היסטורי חשוב שקרה בתאריך זה בהיסטוריה. החזר JSON בלבד: {"title":"שם האירוע","year":"השנה","summary":"תיאור מעניין ומפורט של 3-4 משפטים","significance":"מדוע זה חשוב ומה השפעתו"}`
-        : `Today is ${["January","February","March","April","May","June","July","August","September","October","November","December"][month-1]} ${day}. Tell about an important historical event that happened on this date in history. Return JSON only: {"title":"event name","year":"the year","summary":"interesting detailed description of 3-4 sentences","significance":"why this matters and its impact"}`,
-      500
+        ? `היום הוא ${day} ב${monthNamesHe[month-1]}. פרט 3 אירועים היסטוריים חשובים שקרו בתאריך זה בהיסטוריה העולמית. החזר JSON בלבד, ללא טקסט נוסף, בפורמט הבא:\n[\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." }\n]`
+        : `Today is ${monthNamesEn[month-1]} ${day}. List 3 important historical events that happened on this date in world history. Return JSON only, no extra text, in this format:\n[\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." },\n  { "title": "...", "year": "...", "summary": "...", "significance": "..." }\n]`,
+      1200
     ).then(raw => {
-      try {
-        const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-        localStorage.setItem(cacheKey, JSON.stringify(parsed));
-        setDaily(parsed);
-      } catch { setDaily(null); }
+      const arr = parseJsonEvents(raw);
+      if (arr) {
+        localStorage.setItem(cacheKey, JSON.stringify(arr));
+        setEvents(arr);
+      } else {
+        setError(true);
+      }
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch(() => { setError(true); setLoading(false); });
   }, [lang]);
 
   const today = new Date();
@@ -46,29 +83,52 @@ function DailyEvent({ lang, isHe, onOpenEvent }) {
     ? ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"]
     : ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
+  const daily = events[idx] || null;
+
   return (
     <div style={{
       background:"linear-gradient(135deg, rgba(201,168,76,.08), rgba(201,168,76,.03))",
       border:`1px solid ${T.borderStrong}`,
       borderRadius:16, padding:"20px 24px", marginBottom:28,
     }}>
-      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14 }}>
-        <div style={{ background:"rgba(201,168,76,.15)", border:`1px solid ${T.borderStrong}`, borderRadius:10, padding:"6px 12px", display:"flex", flexDirection:"column", alignItems:"center", minWidth:48 }}>
-          <div style={{ fontSize:"1.3rem", fontWeight:900, color:T.gold, lineHeight:1 }}>{day}</div>
-          <div style={{ fontSize:".6rem", color:T.goldDim, fontWeight:600, textTransform:"uppercase" }}>{monthNames[month].substring(0,3)}</div>
-        </div>
-        <div>
-          <div style={{ fontSize:".68rem", color:T.gold, fontWeight:700, letterSpacing:".12em", textTransform:"uppercase" }}>
-            {isHe ? "האירוע היומי" : "Event of the Day"}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ background:"rgba(201,168,76,.15)", border:`1px solid ${T.borderStrong}`, borderRadius:10, padding:"6px 12px", display:"flex", flexDirection:"column", alignItems:"center", minWidth:48 }}>
+            <div style={{ fontSize:"1.3rem", fontWeight:900, color:T.gold, lineHeight:1 }}>{day}</div>
+            <div style={{ fontSize:".6rem", color:T.goldDim, fontWeight:600, textTransform:"uppercase" }}>{monthNames[month].substring(0,3)}</div>
           </div>
-          <div style={{ fontSize:".76rem", color:T.textMuted }}>{isHe ? "מה קרה היום בהיסטוריה?" : "What happened today in history?"}</div>
+          <div>
+            <div style={{ fontSize:".68rem", color:T.gold, fontWeight:700, letterSpacing:".12em", textTransform:"uppercase" }}>
+              {isHe ? "האירוע היומי" : "Event of the Day"}
+            </div>
+            <div style={{ fontSize:".76rem", color:T.textMuted }}>{isHe ? "מה קרה היום בהיסטוריה?" : "What happened today in history?"}</div>
+          </div>
         </div>
+        {events.length > 1 && (
+          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+            <button onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx === 0} style={{
+              background:"transparent", border:`1px solid ${T.borderStrong}`, borderRadius:7,
+              color: idx === 0 ? T.textMuted : T.gold, cursor: idx === 0 ? "default" : "pointer",
+              padding:"3px 9px", fontSize:".85rem", lineHeight:1,
+            }}>{isHe ? "›" : "‹"}</button>
+            <span style={{ fontSize:".72rem", color:T.textMuted }}>{idx + 1} / {events.length}</span>
+            <button onClick={() => setIdx(i => Math.min(events.length - 1, i + 1))} disabled={idx === events.length - 1} style={{
+              background:"transparent", border:`1px solid ${T.borderStrong}`, borderRadius:7,
+              color: idx === events.length - 1 ? T.textMuted : T.gold, cursor: idx === events.length - 1 ? "default" : "pointer",
+              padding:"3px 9px", fontSize:".85rem", lineHeight:1,
+            }}>{isHe ? "‹" : "›"}</button>
+          </div>
+        )}
       </div>
 
       {loading ? (
         <div style={{ display:"flex", alignItems:"center", gap:10, color:T.textMuted, fontSize:".84rem" }}>
           <Spinner size={16} />
-          {isHe ? "טוען אירוע יומי..." : "Loading daily event..."}
+          {isHe ? "טוען אירועים יומיים..." : "Loading daily events..."}
+        </div>
+      ) : error ? (
+        <div style={{ fontSize:".84rem", color:T.textMuted }}>
+          {isHe ? "לא ניתן היה לטעון את האירועים היומיים." : "Could not load daily events."}
         </div>
       ) : daily ? (
         <div>
