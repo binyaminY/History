@@ -85,7 +85,8 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
         </div>
 
         {/* Timeline grouped by era */}
-        {sortedEras.map(era => { const eraEvents = grouped[era]; return (
+        {sortedEras.map(era => {
+          const eraEvents = grouped[era];
           const eraColor = ERA_COLORS[era] || T.gold;
           return (
             <div key={era} style={{ marginBottom:40 }}>
@@ -163,7 +164,8 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
                 ))}
               </div>
             </div>
-          ); })}
+          );
+        })}
 
       </div>
     </div>
