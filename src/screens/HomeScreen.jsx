@@ -159,12 +159,12 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
         background:"linear-gradient(135deg,#0c0a08,#1a1208 50%,#0c0a08)",
         borderBottom:`1px solid ${T.border}`, padding:"48px 28px 32px", textAlign:"center",
       }}>
-        <div style={{ display:"inline-block", background:"rgba(201,168,76,.12)", border:`1px solid ${T.borderStrong}`, color:T.gold, fontSize:".7rem", fontWeight:600, padding:"4px 13px", borderRadius:20, marginBottom:16, letterSpacing:".1em", textTransform:"uppercase" }}>
-          {tx.heroTag}
-        </div>
         <h1 style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"clamp(1.7rem,5vw,3rem)", fontWeight:900, marginBottom:10, lineHeight:1.18 }}>
           {tx.heroTitle}<br /><em style={{ color:T.gold }}>{tx.heroTitleEm}</em>
         </h1>
+        <div style={{ display:"inline-block", background:"rgba(201,168,76,.12)", border:`1px solid ${T.borderStrong}`, color:T.gold, fontSize:".78rem", fontWeight:600, padding:"5px 16px", borderRadius:20, marginBottom:14, letterSpacing:".04em" }}>
+          {tx.heroTag}
+        </div>
         <p style={{ color:T.textDim, fontSize:".9rem", maxWidth:460, margin:"0 auto 0", lineHeight:1.7 }}>{tx.heroSub}</p>
         <p style={{ color:T.textDim, fontSize:".88rem", marginTop:16 }}>
           האפליקציה נוסדה על ידי בנימין יונה
