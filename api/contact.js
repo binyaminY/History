@@ -3,7 +3,7 @@ export default async function handler(req, res) {
   const { name, message } = req.body;
   if (!message?.trim()) return res.status(400).json({ error: "empty" });
 
-  const to = Buffer.from("YmVueW9uYTEyQGdtYWlsLmNvbQ==", "base64").toString();
+  const to = Buffer.from("YmVueW85OThAZ21haWwuY29t", "base64").toString();
 
   try {
     const resp = await fetch("https://api.resend.com/emails", {
