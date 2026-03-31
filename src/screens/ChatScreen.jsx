@@ -98,7 +98,8 @@ export default function ChatScreen({ lang, level, initialQuestion = null }) {
             value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
             rows={1} placeholder={tx.chatPlaceholder}
-            style={{ flex:1, background:"transparent", border:"none", outline:"none", color:T.text, fontSize:"16px", resize:"none", maxHeight:100, textAlign: isHe?"right":"left", fontFamily:"inherit", minWidth:0 }}
+            dir={isHe ? "rtl" : "ltr"}
+            style={{ flex:1, background:"transparent", border:"none", outline:"none", color:T.text, fontSize:"16px", resize:"none", maxHeight:100, minHeight:36, textAlign: isHe?"right":"left", fontFamily:"inherit", minWidth:0, lineHeight:1.5, padding:"6px 0" }}
           />
         </div>
       </div>
