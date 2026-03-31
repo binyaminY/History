@@ -2,35 +2,11 @@ import { useState } from "react";
 import T from "../constants/theme";
 import TX from "../constants/translations";
 import Btn from "./Btn";
-import Spinner from "./Spinner";
-import { callClaude } from "../api/claude";
 
 export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAsk }) {
   if (!e) return null;
   const tx = TX[lang];
   const [expanded, setExpanded] = useState(false);
-  const [deepInfo, setDeepInfo] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const loadDeepInfo = async () => {
-    setLoading(true);
-    setExpanded(true);
-    try {
-      const text = await callClaude(
-        isHe
-          ? "אתה פרופסור להיסטוריה. כתוב בעברית בלבד. כתוב סיכום מפורט, מעמיק ומעניין."
-          : "You are a history professor. Write a detailed, in-depth and engaging summary.",
-        isHe
-          ? `כתוב סיכום מקיף ומפורט על "${e.name}" (${e.year}). כלול: דמויות מפתח, גורמים וסיבות, השפעה היסטורית, עובדות מעניינות ומפתיעות, ומורשת עד היום. כתוב לפחות 300 מילים בצורה מרתקת.`
-          : `Write a comprehensive and detailed summary of "${e.name}" (${e.year}). Include: key figures, causes and factors, historical impact, interesting and surprising facts, and legacy to this day. Write at least 300 words in an engaging way.`,
-        1500
-      );
-      setDeepInfo(text);
-    } catch {
-      setDeepInfo(isHe ? "שגיאה בטעינת המידע. נסה שוב." : "Error loading info. Try again.");
-    }
-    setLoading(false);
-  };
 
   return (
     <div onClick={onClose} style={{
@@ -85,7 +61,7 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
 
           {/* Deep info button / content */}
           {!expanded && (
-            <button onClick={loadDeepInfo} style={{
+            <button onClick={() => setExpanded(true)} style={{
               width:"100%", background:"linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.06))",
               border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"15px 20px",
               cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:10,
@@ -99,37 +75,38 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
           )}
 
           {expanded && (
-            <div style={{ background:T.surface2, border:`1px solid ${T.border}`, borderRadius:12, padding:"18px 20px", marginBottom:16 }}>
-              <div style={{ fontSize:".68rem", color:T.gold, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase", marginBottom:12 }}>📖 {isHe ? "סיכום מקיף" : "Comprehensive Summary"}</div>
-              {loading ? (
-                <div style={{ display:"flex", alignItems:"center", gap:10, color:T.textMuted, fontSize:".86rem", padding:"10px 0" }}>
-                  <Spinner size={18} />
-                  {isHe ? "ה-AI מכין סיכום מפורט..." : "AI is preparing detailed summary..."}
-                </div>
-              ) : (
+            <div style={{ marginBottom:16 }}>
+              <div style={{ background:T.surface2, border:`1px solid ${T.border}`, borderRadius:12, padding:"18px 20px", marginBottom:14 }}>
+                <div style={{ fontSize:".68rem", color:T.gold, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase", marginBottom:12 }}>📖 {isHe ? "סיכום מקיף" : "Comprehensive Summary"}</div>
                 <div style={{ fontSize:".88rem", color:T.textDim, lineHeight:1.9 }}>
-                  {deepInfo.split("\n").map((line, i) => {
-                    const trimmed = line.trim();
-                    if (!trimmed) return <div key={i} style={{ height: 8 }} />;
-                    // Bullet lines: start with * or -
-                    const isBullet = /^[*\-•]\s/.test(trimmed);
-                    const text = trimmed.replace(/^[*\-•]\s*/, "");
-                    // Bold: **text**
-                    const parts = text.split(/(\*\*[^*]+\*\*)/g).map((p, j) =>
-                      p.startsWith("**") && p.endsWith("**")
-                        ? <strong key={j} style={{ color: T.gold, fontWeight: 700 }}>{p.slice(2, -2)}</strong>
-                        : p
-                    );
-                    if (isBullet) return (
-                      <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start", marginBottom:6 }}>
-                        <span style={{ color:T.gold, fontWeight:700, flexShrink:0, marginTop:2 }}>›</span>
-                        <span>{parts}</span>
-                      </div>
-                    );
-                    return <p key={i} style={{ marginBottom:10 }}>{parts}</p>;
-                  })}
+                  {e.deep}
                 </div>
-              )}
+              </div>
+
+              {/* AI suggestion banner */}
+              <div
+                onClick={onAsk}
+                style={{
+                  background:"linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05))",
+                  border:`1px solid ${T.borderStrong}`,
+                  borderRadius:12, padding:"14px 18px",
+                  cursor:"pointer", display:"flex", alignItems:"center", gap:12,
+                  transition:"all .2s",
+                }}
+                onMouseEnter={el => { el.currentTarget.style.background="rgba(201,168,76,.15)"; }}
+                onMouseLeave={el => { el.currentTarget.style.background="linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05))"; }}
+              >
+                <span style={{ fontSize:"1.4rem", flexShrink:0 }}>💬</span>
+                <div>
+                  <div style={{ fontSize:".85rem", fontWeight:700, color:T.gold, marginBottom:3 }}>
+                    {isHe ? "רוצה לדעת עוד?" : "Want to know more?"}
+                  </div>
+                  <div style={{ fontSize:".78rem", color:T.textMuted }}>
+                    {isHe ? `שאל את ה-AI כל שאלה על "${e.name}"` : `Ask the AI anything about "${e.name}"`}
+                  </div>
+                </div>
+                <span style={{ marginRight:"auto", marginLeft:"auto", color:T.gold, fontSize:"1.1rem", flexShrink:0, [isHe?"marginRight":"marginLeft"]:"auto" }}>›</span>
+              </div>
             </div>
           )}
 
