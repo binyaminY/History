@@ -61,16 +61,22 @@ export default function QuizScreen({ lang, events, level }) {
       ? `You are a history quiz generator. ${levelInstr} ${noQuotes} Generate ONE open-ended question. Return ONLY valid JSON with no extra text: {"question":"...","ideal_answer":"...","key_points":["...","...","..."]}`
       : `You are a history quiz generator. ${levelInstr} ${noQuotes} Generate ONE multiple-choice question. Return ONLY valid JSON with no extra text: {"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"2-3 sentences."} Don't repeat: ${prevQs||"none"}`;
 
-    try {
-      const raw = await callClaude(
-        systemPrompt,
-        `Question ${num+1} of ${TOTAL_Q} about: ${e?.name} (${e?.year}). Context: ${e?.desc}`,
-        600
-      );
-      if (!parsed) throw new Error("parse failed");
+    let parsed = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const raw = await callClaude(
+          systemPrompt,
+          `Question ${num+1} of ${TOTAL_Q} about: ${e?.name} (${e?.year}). Context: ${e?.desc}`,
+          600
+        );
+        parsed = parseQuizJson(raw);
+        if (parsed) break;
+      } catch {}
+    }
+    if (parsed) {
       setCurrentQ({ ...parsed, type: qtype });
       setQPhase("question");
-    } catch {
+    } else {
       setCurrentQ({ question: tx.quizError, type: qtype, options:[], correct:0, explanation:"" });
       setQPhase("question");
     }
