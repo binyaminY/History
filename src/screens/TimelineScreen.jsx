@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import T from "../constants/theme";
 import TX from "../constants/translations";
 import { LEVEL_ORDER } from "../constants/events";
@@ -73,9 +73,9 @@ function AITimeline({ themeId, themeLabel, themeColor, isHe, lang }) {
     const cacheKey = `hm_theme_v1_${themeId}_${lang}`;
     const cached = (() => { try { return JSON.parse(localStorage.getItem(cacheKey)); } catch { return null; } })();
     if (cached && Array.isArray(cached) && cached.length > 0) {
-      setItems(cached); return;
+      setItems(cached); setLoading(false); return;
     }
-    setLoading(true); setError(false);
+    setLoading(true); setError(false); setItems(null);
 
     const themeNames = {
       empires: isHe ? "אימפריות גדולות בהיסטוריה" : "great empires throughout history",
@@ -107,15 +107,7 @@ function AITimeline({ themeId, themeLabel, themeColor, isHe, lang }) {
     }).catch(() => { setError(true); setLoading(false); });
   };
 
-  if (!items && !loading && !error) {
-    load();
-    return (
-      <div style={{ display:"flex", alignItems:"center", gap:10, color:T.textMuted, fontSize:".84rem", padding:"20px 0" }}>
-        <Spinner size={18} />
-        {isHe ? `טוען ציר זמן: ${themeLabel}...` : `Loading timeline: ${themeLabel}...`}
-      </div>
-    );
-  }
+  useEffect(() => { load(); }, [themeId, lang]);
 
   if (loading) return (
     <div style={{ display:"flex", alignItems:"center", gap:10, color:T.textMuted, fontSize:".84rem", padding:"20px 0" }}>
