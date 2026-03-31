@@ -23,7 +23,13 @@ export default function ChatScreen({ lang, level, initialQuestion = null }) {
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages]);
 
-  useEffect(() => {}, []);
+  const sentInitial = useRef(false);
+  useEffect(() => {
+    if (initialQuestion && !sentInitial.current) {
+      sentInitial.current = true;
+      send(initialQuestion);
+    }
+  }, [initialQuestion]);
 
   const send = useCallback(async (text) => {
     const t = text || input;
