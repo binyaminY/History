@@ -64,7 +64,24 @@ export default function ChatScreen({ lang, level, initialQuestion = null }) {
   return (
     <div style={{ flex:1, display:"flex", flexDirection:"column", minHeight:0, overflow:"hidden" }}>
       <div style={{ flex:1, overflowY:"auto", padding:"20px 26px", display:"flex", flexDirection:"column", gap:13 }}>
-        {messages.map((msg, i) => (
+        {messages.map((msg, i) => {
+          // Welcome message — centered, big
+          const isWelcome = i === 0 && msg.role === "ai";
+          if (isWelcome) return (
+            <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"40px 20px", maxWidth:580, margin:"0 auto", width:"100%" }}>
+              <div style={{ fontSize:"2.2rem", marginBottom:16 }}>🏛</div>
+              <div style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"1.5rem", fontWeight:900, color:T.gold, marginBottom:10 }}>{tx.chatWelcomeTitle.replace("🏛","").trim()}</div>
+              <div style={{ fontSize:".95rem", color:T.textDim, lineHeight:1.8, marginBottom:28 }}>{tx.chatWelcomeBody}</div>
+              {msg.suggestions?.length > 0 && (
+                <div style={{ display:"flex", gap:8, flexWrap:"wrap", justifyContent:"center" }}>
+                  {msg.suggestions.map((s,j) => (
+                    <button key={j} onClick={() => send(s)} style={{ background:T.surface, border:`1px solid ${T.borderStrong}`, borderRadius:20, padding:"8px 16px", fontSize:".82rem", color:T.gold, cursor:"pointer", fontFamily:"inherit" }}>→ {s}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+          return (
           <div key={i} style={{ maxWidth:640, alignSelf: msg.role==="user" ? (isHe?"flex-start":"flex-end") : (isHe?"flex-end":"flex-start") }}>
             <div style={{
               padding:"12px 16px", fontSize:".87rem", lineHeight:1.75,
@@ -88,7 +105,7 @@ export default function ChatScreen({ lang, level, initialQuestion = null }) {
               </div>
             )}
           </div>
-        ))}
+        );})}
         <div ref={endRef} />
       </div>
       <div style={{ borderTop:`1px solid ${T.border}`, padding:"13px 20px", paddingBottom:"max(13px, calc(13px + env(safe-area-inset-bottom)))", paddingInlineStart:"max(20px, calc(20px + env(safe-area-inset-left)))", paddingInlineEnd:"max(20px, calc(20px + env(safe-area-inset-right)))", background:T.surface, flexShrink:0 }}>
