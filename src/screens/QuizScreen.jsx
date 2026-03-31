@@ -6,6 +6,20 @@ import Btn from "../components/Btn";
 import LoadingCard from "../components/LoadingCard";
 import SectionLabel from "../components/SectionLabel";
 
+function parseQuizJson(raw) {
+  let clean = raw.replace(/```json|```/gi, "").trim();
+  // find first { and last }
+  const start = clean.indexOf("{");
+  const end = clean.lastIndexOf("}");
+  if (start === -1 || end === -1) return null;
+  clean = clean.slice(start, end + 1);
+  try { return JSON.parse(clean); } catch {}
+  // try replacing curly quotes
+  clean = clean.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
+  try { return JSON.parse(clean); } catch {}
+  return null;
+}
+
 export default function QuizScreen({ lang, events, level }) {
   const isHe = lang === "he";
   const tx = TX[lang];
@@ -53,7 +67,7 @@ export default function QuizScreen({ lang, events, level }) {
         `Question ${num+1} of ${TOTAL_Q} about: ${e?.name} (${e?.year}). Context: ${e?.desc}`,
         600
       );
-      const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
+      if (!parsed) throw new Error("parse failed");
       setCurrentQ({ ...parsed, type: qtype });
       setQPhase("question");
     } catch {
