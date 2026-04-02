@@ -54,12 +54,15 @@ export default function QuizScreen({ lang, events, level }) {
     setQPhase("loading"); setCurrentQ(null); setFeedback(null); setOpenInput("");
     const e = events.find(x => x.id === eid);
     const qtype = Q_TYPES[num];
-    const prevQs = prevAnswers.map(a => a.question).join(" | ");
+    const prevQs = prevAnswers.map(a => a.question);
+    const prevQsStr = prevQs.join(" | ");
 
     const noQuotes = "IMPORTANT: Do NOT use double-quote characters inside any text values.";
     const systemPrompt = qtype === "open"
       ? `You are a history quiz generator. ${levelInstr} ${noQuotes} Generate ONE open-ended question. Return ONLY valid JSON with no extra text: {"question":"...","ideal_answer":"...","key_points":["...","...","..."]}`
-      : `You are a history quiz generator. ${levelInstr} ${noQuotes} Generate ONE multiple-choice question. Return ONLY valid JSON with no extra text: {"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"2-3 sentences."} Don't repeat: ${prevQs||"none"}`;
+      : `You are a history quiz generator. ${levelInstr} ${noQuotes} Generate ONE multiple-choice question. CRITICAL: you MUST generate a DIFFERENT question each time. These questions were already asked — do NOT repeat them: [${prevQsStr||"none"}]. Return ONLY valid JSON: {"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"2-3 sentences."}`;
+
+    const isDuplicate = (q) => prevQs.some(p => p && q && p.trim().slice(0,30) === q.trim().slice(0,30));
 
     let parsed = null;
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -69,8 +72,8 @@ export default function QuizScreen({ lang, events, level }) {
           `Question ${num+1} of ${TOTAL_Q} about: ${e?.name} (${e?.year}). Context: ${e?.desc}`,
           600
         );
-        parsed = parseQuizJson(raw);
-        if (parsed) break;
+        const candidate = parseQuizJson(raw);
+        if (candidate && !isDuplicate(candidate.question)) { parsed = candidate; break; }
       } catch {}
     }
     if (parsed) {
