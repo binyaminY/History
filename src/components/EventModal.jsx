@@ -40,24 +40,6 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
         </div>
 
         <div style={{ padding:"24px 28px" }}>
-          {/* Description */}
-          <div style={{ fontSize:".92rem", color:T.text, lineHeight:1.9, marginBottom:20, padding:"16px 18px", background:"rgba(37,99,235,.04)", borderRadius:12, border:`1px solid ${T.border}` }}>
-            {e.desc}
-          </div>
-
-          {/* Quick facts */}
-          <div style={{ background:T.surface3, border:`1px solid ${T.border}`, borderRadius:12, padding:"14px 16px", marginBottom:22 }}>
-            <div style={{ fontSize:".68rem", color:T.gold, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase", marginBottom:10 }}>⚡ {tx.quickMode}</div>
-            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-              {e.quick.map((q, i) => (
-                <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
-                  <span style={{ color:T.gold, fontSize:"1.1rem", lineHeight:1, flexShrink:0 }}>›</span>
-                  <span style={{ fontSize:".86rem", color:T.textDim, lineHeight:1.7 }}>{q}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Extended summary as one plain text bubble */}
           {e.deep && (
             <div style={{ background:T.surface2, border:`1px solid ${T.border}`, borderRadius:12, padding:"18px 20px", marginBottom:16 }}>
