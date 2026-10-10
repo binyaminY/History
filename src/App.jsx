@@ -5,23 +5,30 @@ import EVENTS from "./constants/events";
 import EventModal from "./components/EventModal";
 import HomeScreen from "./screens/HomeScreen";
 import TimelineScreen from "./screens/TimelineScreen";
-import ChatScreen from "./screens/ChatScreen";
 import SavedScreen from "./screens/SavedScreen";
-import QuizScreen from "./screens/QuizScreen";
 import BackgroundArt from "./components/BackgroundArt";
-import ContactModal from "./components/ContactModal";
+
+const TEXT_SIZES = [100, 112, 125, 140];
+const DEFAULT_SIZE = 1;
 
 export default function App() {
   const [lang, setLang] = useState("he");
   const level = "beginner";
   const [screen, setScreen] = useState("home");
   const [saved, setSaved] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("hm_react_saved") || "[]"); } catch { return []; }
+    try {
+      const parsed = JSON.parse(localStorage.getItem("hm_react_saved") || "[]");
+      return Array.isArray(parsed) ? parsed.filter(x => x && typeof x.id === "string") : [];
+    } catch { return []; }
   });
   const [toast, setToast] = useState("");
   const [modal, setModal] = useState(null);
-  const [chatInitQ, setChatInitQ] = useState(null);
-  const [contactOpen, setContactOpen] = useState(false);
+  const [sizeIdx, setSizeIdx] = useState(() => {
+    try {
+      const v = Number(localStorage.getItem("hm_text_size"));
+      return Number.isInteger(v) && v >= 0 && v < TEXT_SIZES.length ? v : DEFAULT_SIZE;
+    } catch { return DEFAULT_SIZE; }
+  });
 
   const isHe = lang === "he";
   const tx = TX[lang];
@@ -35,6 +42,16 @@ export default function App() {
     try { localStorage.setItem("hm_react_saved", JSON.stringify(saved)); } catch {}
   }, [saved]);
 
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isHe ? "rtl" : "ltr";
+  }, [lang, isHe]);
+
+  useEffect(() => {
+    document.documentElement.style.fontSize = TEXT_SIZES[sizeIdx] + "%";
+    try { localStorage.setItem("hm_text_size", String(sizeIdx)); } catch {}
+  }, [sizeIdx]);
+
   const saveEvent = (id) => {
     const e = events.find(x => x.id === id);
     if (!e) return;
@@ -45,20 +62,10 @@ export default function App() {
 
   const removeItem = (idx) => setSaved(s => s.filter((_,i) => i !== idx));
 
-  const openEventAndGoChat = (id) => {
-    const e = events.find(x => x.id === id);
-    if (!e) return;
-    setModal(null);
-    setChatInitQ(tx.askAbout + e.name);
-    setScreen("chat");
-  };
-
   const navTabs = [
     { id:"home", label:tx.navExplore },
     { id:"timeline", label:tx.navTimeline },
-    { id:"chat", label:tx.navChat },
     { id:"saved", label:tx.navSaved },
-    { id:"quiz", label:tx.navQuiz },
   ];
 
   const modalEvent = modal ? events.find(e => e.id === modal) : null;
@@ -76,7 +83,7 @@ export default function App() {
         @keyframes hm-spin { to { transform: rotate(360deg); } }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: rgba(201,168,76,.35); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(37,99,235,.35); border-radius: 3px; }
         button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         input, textarea, select { font-size: 16px; }
       `}</style>
@@ -87,7 +94,7 @@ export default function App() {
         paddingInlineStart:"max(24px, calc(24px + env(safe-area-inset-left)))",
         paddingInlineEnd:"max(24px, calc(24px + env(safe-area-inset-right)))",
         borderBottom:`1px solid ${T.border}`,
-        background:"rgba(12,10,8,.97)", backdropFilter:"blur(20px)",
+        background:"rgba(255,255,255,.98)", backdropFilter:"blur(20px)",
         position:"sticky", top:0, zIndex:100, flexWrap:"wrap", gap:8,
       }}>
         <div style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"1.35rem", fontWeight:900, color:T.gold }}>
@@ -95,20 +102,30 @@ export default function App() {
         </div>
         <div style={{ display:"flex", gap:3, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:11, padding:3, flexWrap:"wrap", justifyContent:"center" }}>
           {navTabs.map(tab => (
-            <button key={tab.id} onClick={() => { setScreen(tab.id); setChatInitQ(null); }} style={{
+            <button key={tab.id} onClick={() => setScreen(tab.id)} style={{
               padding:"6px 13px", borderRadius:8, border:"none",
               background: screen===tab.id ? T.gold : "transparent",
-              color: screen===tab.id ? "#0c0a08" : T.textDim,
+              color: screen===tab.id ? "#ffffff" : T.textDim,
               cursor:"pointer", fontSize:".8rem", fontWeight: screen===tab.id ? 700 : 500,
               transition:"all .2s", whiteSpace:"nowrap", fontFamily:"inherit",
             }}>{tab.label}</button>
           ))}
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <button onClick={() => setContactOpen(true)} style={{
-            background:T.surface2, border:`1px solid ${T.border}`, borderRadius:20,
-            padding:"5px 13px", fontSize:".79rem", color:T.textDim, cursor:"pointer", fontFamily:"inherit",
-          }}>{isHe ? "✉️ צור קשר" : "✉️ Contact"}</button>
+          <div role="group" aria-label={isHe ? "גודל טקסט" : "Text size"} style={{ display:"flex", alignItems:"center", gap:2, background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20, padding:2 }}>
+            <button onClick={() => setSizeIdx(i => Math.max(0, i - 1))} disabled={sizeIdx === 0}
+              aria-label={isHe ? "הקטן טקסט" : "Smaller text"} style={{
+              background:"transparent", border:"none", borderRadius:16, width:30, height:28,
+              color: sizeIdx === 0 ? T.textMuted : T.gold, cursor: sizeIdx === 0 ? "default" : "pointer",
+              fontSize:".78rem", fontWeight:700, fontFamily:"inherit",
+            }}>A−</button>
+            <button onClick={() => setSizeIdx(i => Math.min(TEXT_SIZES.length - 1, i + 1))} disabled={sizeIdx === TEXT_SIZES.length - 1}
+              aria-label={isHe ? "הגדל טקסט" : "Larger text"} style={{
+              background:"transparent", border:"none", borderRadius:16, width:30, height:28,
+              color: sizeIdx === TEXT_SIZES.length - 1 ? T.textMuted : T.gold, cursor: sizeIdx === TEXT_SIZES.length - 1 ? "default" : "pointer",
+              fontSize:"1.02rem", fontWeight:700, fontFamily:"inherit",
+            }}>A+</button>
+          </div>
           <button onClick={() => setLang(l => l==="he"?"en":"he")} style={{
             background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20,
             padding:"5px 13px", fontSize:".79rem", color:T.gold, cursor:"pointer", fontFamily:"inherit",
@@ -118,9 +135,7 @@ export default function App() {
 
       {screen === "home" && <HomeScreen lang={lang} events={events} level={level} onOpenEvent={id => setModal(id)} />}
       {screen === "timeline" && <TimelineScreen lang={lang} events={events} level={level} onOpenEvent={id => setModal(id)} />}
-      {screen === "chat" && <ChatScreen key={lang+level+(chatInitQ||"")} lang={lang} level={level} initialQuestion={chatInitQ} />}
-      {screen === "saved" && <SavedScreen lang={lang} saved={saved} onRemove={removeItem} />}
-      {screen === "quiz" && <QuizScreen lang={lang} events={events} level={level} />}
+      {screen === "saved" && <SavedScreen lang={lang} events={events} saved={saved} onRemove={removeItem} />}
 
       {modalEvent && (
         <EventModal
@@ -129,11 +144,8 @@ export default function App() {
           isHe={isHe}
           onClose={() => setModal(null)}
           onSave={() => { saveEvent(modal); setModal(null); }}
-          onAsk={() => openEventAndGoChat(modal)}
         />
       )}
-
-      {contactOpen && <ContactModal isHe={isHe} onClose={() => setContactOpen(false)} />}
 
       {toast && <div style={{
         position:"fixed", bottom:90, left:"50%", transform:"translateX(-50%)",

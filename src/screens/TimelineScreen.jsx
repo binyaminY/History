@@ -1,19 +1,23 @@
 import { useState } from "react";
 import T from "../constants/theme";
-import TX from "../constants/translations";
+import TX, { tagLabel } from "../constants/translations";
 import { LEVEL_ORDER } from "../constants/events";
 
 const ERA_COLORS = {
-  "עולם עתיק": "#c9a84c",
-  "ימי הביניים": "#7a6430",
-  "המאה ה-18": "#4ca86a",
-  "המאה ה-19": "#4c8ac9",
-  "המאה ה-20": "#c94c4c",
-  "Ancient World": "#c9a84c",
-  "Middle Ages": "#7a6430",
-  "18th Century": "#4ca86a",
-  "19th Century": "#4c8ac9",
-  "20th Century": "#c94c4c",
+  "עולם עתיק": "#b45309",
+  "ימי הביניים": "#7c3aed",
+  "המאה ה-15–16": "#db2777",
+  "המאה ה-18": "#16a34a",
+  "המאה ה-19": "#2563eb",
+  "המאה ה-20": "#dc2626",
+  "המאה ה-21": "#0891b2",
+  "Ancient World": "#b45309",
+  "Middle Ages": "#7c3aed",
+  "15th–16th Century": "#db2777",
+  "18th Century": "#16a34a",
+  "19th Century": "#2563eb",
+  "20th Century": "#dc2626",
+  "21st Century": "#0891b2",
 };
 
 function extractSortYear(yearStr) {
@@ -26,8 +30,8 @@ function extractSortYear(yearStr) {
 }
 
 const ERA_ORDER = {
-  "עולם עתיק": 0, "ימי הביניים": 1, 'המאה ה-18': 2, "המאה ה-19": 3, "המאה ה-20": 4,
-  "Ancient World": 0, "Middle Ages": 1, "18th Century": 2, "19th Century": 3, "20th Century": 4,
+  "עולם עתיק": 0, "ימי הביניים": 1, "המאה ה-15–16": 2, "המאה ה-18": 3, "המאה ה-19": 4, "המאה ה-20": 5, "המאה ה-21": 6,
+  "Ancient World": 0, "Middle Ages": 1, "15th–16th Century": 2, "18th Century": 3, "19th Century": 4, "20th Century": 5, "21st Century": 6,
 };
 
 export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
@@ -63,7 +67,7 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
       <div style={{ maxWidth:860, margin:"0 auto" }}>
         <h2 style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"1.65rem", marginBottom:6 }}>{tx.tlTitle}</h2>
         <p style={{ color:T.textMuted, fontSize:".82rem", marginBottom:22 }}>
-          {isHe ? `${items.length} אירועים` : `${items.length} events`}
+          {tx.eventsCount(items.length)}
         </p>
 
         {/* Filters */}
@@ -72,7 +76,7 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
             <button key={f.k} onClick={() => setFilter(f.k)} style={{
               padding:"6px 14px", borderRadius:20, fontFamily:"inherit",
               border:`1px solid ${filter===f.k ? T.gold : T.border}`,
-              background: filter===f.k ? "rgba(201,168,76,.12)" : "transparent",
+              background: filter===f.k ? "rgba(37,99,235,.12)" : "transparent",
               color: filter===f.k ? T.gold : T.textDim,
               fontSize:".78rem", cursor:"pointer", fontWeight: filter===f.k ? 700 : 400,
               transition:"all .2s",
@@ -133,12 +137,12 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
                         }}>📅 {e.year}</div>
                       </div>
                       <div style={{ fontSize:".82rem", color:T.textDim, lineHeight:1.65, marginBottom:10 }}>
-                        {e.desc.substring(0, 130)}...
+                        {e.desc}
                       </div>
                       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:8 }}>
                         <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
                           {e.tags.map(tag => (
-                            <span key={tag} style={{ fontSize:".62rem", padding:"2px 7px", borderRadius:20, background:T.surface3, color:T.textMuted, border:`1px solid ${T.border}` }}>{tag}</span>
+                            <span key={tag} style={{ fontSize:".62rem", padding:"2px 7px", borderRadius:20, background:T.surface3, color:T.textMuted, border:`1px solid ${T.border}` }}>{tagLabel(lang, tag)}</span>
                           ))}
                         </div>
                         <button
