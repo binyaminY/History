@@ -1,7 +1,8 @@
 import Groq from "groq-sdk";
 
-// Chat uses a small, fast model with short answers; the quiz needs reliable JSON.
-const CHAT_MODEL = process.env.GROQ_CHAT_MODEL || "openai/gpt-oss-20b";
+// The 20b model produced inaccurate, garbled Hebrew, so chat also uses 120b;
+// answers stay short through the prompt and the token cap.
+const CHAT_MODEL = process.env.GROQ_CHAT_MODEL || "openai/gpt-oss-120b";
 const QUIZ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 
 const LIMITS = {
