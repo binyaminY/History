@@ -13,7 +13,29 @@ const merged = {};
 for (const part of [a, b, c, d, moreA, moreB, moreC, moreD, moreE]) {
   for (const [topic, rows] of Object.entries(part)) merged[topic] = [...(merged[topic] || []), ...rows];
 }
-const DATA = merged;
+// Drops repeated questions inside a topic, keeping the first one. Two questions are the same
+// when they share the same content words; question words like "when" or "why" still count.
+const FILLER = new Set(["מה", "מהו", "מהי", "זה", "זו", "זאת", "היה", "הייתה", "היתה", "היו", "הם", "הוא", "היא", "של", "את", "על", "what", "is", "was", "the", "a", "an", "of", "are", "were"]);
+const sameWords = (text) => String(text)
+  .toLowerCase()
+  .replace(/["'״׳?!.,:;()\-–—]/g, " ")
+  .split(/\s+/)
+  .filter(Boolean)
+  .map(t => (t.length > 3 && /^[הובלמשכ]/.test(t) ? t.slice(1) : t))
+  .filter(t => t.length > 1 && !FILLER.has(t));
+const DATA = {};
+for (const [topic, rows] of Object.entries(merged)) {
+  const seen = [];
+  DATA[topic] = rows.filter(row => {
+    const words = new Set(sameWords(row[0]));
+    const repeated = seen.some(prev => {
+      const shared = [...words].filter(w => prev.has(w)).length;
+      return words.size > 0 && shared / Math.max(words.size, prev.size) >= 0.8;
+    });
+    if (!repeated) seen.push(words);
+    return !repeated;
+  });
+}
 
 const toItem = (topic, row, i, lang) => ({
   id: `${topic}-${i}`,
