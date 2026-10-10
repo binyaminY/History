@@ -4,7 +4,6 @@ import TX, { tagLabel } from "../constants/translations";
 import Btn from "./Btn";
 
 export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAsk }) {
-  const [expanded, setExpanded] = useState(false);
   if (!e) return null;
   const tx = TX[lang];
 
@@ -72,29 +71,11 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
             </span>
             <span style={{ color:"#422006", fontSize:"1.1rem", flexShrink:0 }}>{isHe ? "‹" : "›"}</span>
           </button>
-
-          {/* Deep info button / content */}
-          {!expanded && (
-            <button onClick={() => setExpanded(true)} style={{
-              width:"100%", background:"linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.06))",
-              border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"15px 20px",
-              cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:10,
-              marginBottom:8, fontFamily:"inherit",
-            }}>
-              <span style={{ fontSize:"1.1rem" }}>📖</span>
-              <span style={{ fontSize:".95rem", fontWeight:700, color:T.gold }}>
-                {tx.readMore}
-              </span>
-            </button>
-          )}
-
-          {expanded && (
-            <div style={{ marginBottom:16 }}>
-              <div style={{ background:T.surface2, border:`1px solid ${T.border}`, borderRadius:12, padding:"18px 20px", marginBottom:14 }}>
-                <div style={{ fontSize:".68rem", color:T.gold, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase", marginBottom:12 }}>📖 {tx.fullSummary}</div>
-                <div style={{ fontSize:".9rem", color:T.textDim, lineHeight:1.95, whiteSpace:"pre-line" }}>
-                  {e.deep}
-                </div>
+          {/* Extended summary as one plain text bubble */}
+          {e.deep && (
+            <div style={{ background:T.surface2, border:`1px solid ${T.border}`, borderRadius:12, padding:"18px 20px", marginBottom:16 }}>
+              <div style={{ fontSize:".9rem", color:T.textDim, lineHeight:1.95, whiteSpace:"pre-line" }}>
+                {e.deep}
               </div>
             </div>
           )}
