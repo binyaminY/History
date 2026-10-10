@@ -25,7 +25,7 @@ export default function App() {
   });
   const [toast, setToast] = useState("");
   const [modal, setModal] = useState(null);
-  const [chatInitQ, setChatInitQ] = useState(null);
+  const [chatTopic, setChatTopic] = useState(null);
   const [sizeIdx, setSizeIdx] = useState(() => {
     try {
       const v = Number(localStorage.getItem("hm_text_size"));
@@ -69,7 +69,7 @@ export default function App() {
     const e = events.find(x => x.id === id);
     if (!e) return;
     setModal(null);
-    setChatInitQ(tx.askAbout + e.name);
+    setChatTopic({ id: e.id, name: e.name });
     setScreen("chat");
   };
 
@@ -115,7 +115,7 @@ export default function App() {
         </div>
         <div style={{ display:"flex", gap:3, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:11, padding:3, flexWrap:"wrap", justifyContent:"center" }}>
           {navTabs.map(tab => (
-            <button key={tab.id} onClick={() => { setScreen(tab.id); setChatInitQ(null); }} style={{
+            <button key={tab.id} onClick={() => { setScreen(tab.id); setChatTopic(null); }} style={{
               padding:"6px 13px", borderRadius:8, border:"none",
               background: screen===tab.id ? T.gold : "transparent",
               color: screen===tab.id ? "#ffffff" : T.textDim,
@@ -148,7 +148,7 @@ export default function App() {
 
       {screen === "home" && <HomeScreen lang={lang} events={events} level={level} onOpenEvent={id => setModal(id)} />}
       {screen === "timeline" && <TimelineScreen lang={lang} events={events} level={level} onOpenEvent={id => setModal(id)} />}
-      {screen === "chat" && <ChatScreen key={lang + (chatInitQ || "")} lang={lang} level={level} initialQuestion={chatInitQ} />}
+      {screen === "chat" && <ChatScreen key={lang + (chatTopic?.id || "")} lang={lang} topic={chatTopic && { ...chatTopic, name: events.find(x => x.id === chatTopic.id)?.name || chatTopic.name }} onClearTopic={() => setChatTopic(null)} />}
       {screen === "saved" && <SavedScreen lang={lang} events={events} saved={saved} onRemove={removeItem} />}
       {screen === "quiz" && <QuizScreen lang={lang} events={events} level={level} />}
 

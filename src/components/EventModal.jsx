@@ -59,6 +59,20 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
             </div>
           </div>
 
+          {/* Ask the AI about this topic */}
+          <button type="button" onClick={onAsk} style={{
+            width:"100%", background:"linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.05))",
+            border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"14px 18px", marginBottom:14,
+            cursor:"pointer", display:"flex", alignItems:"center", gap:12, fontFamily:"inherit", textAlign: isHe ? "right" : "left",
+          }}>
+            <span style={{ fontSize:"1.5rem", flexShrink:0 }}>🤖</span>
+            <span style={{ flex:1 }}>
+              <span style={{ display:"block", fontSize:".9rem", fontWeight:700, color:T.gold, marginBottom:3 }}>{tx.askBannerTitle}</span>
+              <span style={{ display:"block", fontSize:".8rem", color:T.textDim }}>{tx.askBannerBody}</span>
+            </span>
+            <span style={{ color:T.gold, fontSize:"1.1rem", flexShrink:0 }}>{isHe ? "‹" : "›"}</span>
+          </button>
+
           {/* Deep info button / content */}
           {!expanded && (
             <button onClick={() => setExpanded(true)} style={{
@@ -80,21 +94,6 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
                 <div style={{ fontSize:".68rem", color:T.gold, fontWeight:700, letterSpacing:".1em", textTransform:"uppercase", marginBottom:12 }}>📖 {tx.fullSummary}</div>
                 <div style={{ fontSize:".9rem", color:T.textDim, lineHeight:1.95, whiteSpace:"pre-line" }}>
                   {e.deep}
-                </div>
-              </div>
-              <div onClick={onAsk} style={{
-                background:"linear-gradient(135deg,rgba(37,99,235,.1),rgba(37,99,235,.05))",
-                border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"14px 18px",
-                cursor:"pointer", display:"flex", alignItems:"center", gap:12,
-              }}>
-                <span style={{ fontSize:"1.4rem", flexShrink:0 }}>💬</span>
-                <div>
-                  <div style={{ fontSize:".85rem", fontWeight:700, color:T.gold, marginBottom:3 }}>
-                    {isHe ? "רוצה לדעת עוד?" : "Want to know more?"}
-                  </div>
-                  <div style={{ fontSize:".78rem", color:T.textMuted }}>
-                    {isHe ? `שאל כל שאלה על "${e.name}"` : `Ask any question about "${e.name}"`}
-                  </div>
                 </div>
               </div>
             </div>

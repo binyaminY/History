@@ -75,19 +75,21 @@ export default function QuizScreen({ lang, events, level }) {
     const isDuplicate = (q) => prevQs.some(p => p && q && p.trim().slice(0,30) === q.trim().slice(0,30));
 
     let parsed = null;
+    let serverMessage = null;
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const raw = await callClaude(
           systemPrompt,
           `Question ${num+1} of ${TOTAL_Q} about: ${e?.name} (${e?.year}). Context: ${e?.desc}`,
-          600
+          600,
+          lang
         );
         const candidate = parseQuizJson(raw);
         const valid = candidate && typeof candidate.question === "string" && candidate.question.trim() &&
           (qtype === "open" || (Array.isArray(candidate.options) && candidate.options.length >= 2));
         if (valid && !isDuplicate(candidate.question)) { parsed = candidate; break; }
       } catch (err) {
-        if (err?.noRetry) break;
+        if (err?.noRetry) { serverMessage = err.userMessage || null; break; }
       }
     }
     if (myReq !== reqRef.current) return;
@@ -95,7 +97,7 @@ export default function QuizScreen({ lang, events, level }) {
       setCurrentQ({ ...parsed, type: qtype });
       setQPhase("question");
     } else {
-      setCurrentQ({ question: tx.quizError, type: qtype, options:[], correct:0, explanation:"", failed:true });
+      setCurrentQ({ question: serverMessage || tx.quizError, type: qtype, options:[], correct:0, explanation:"", failed:true });
       setQPhase("question");
     }
   };
@@ -119,7 +121,8 @@ export default function QuizScreen({ lang, events, level }) {
       const raw = await callClaude(
         `You are a history teacher grading an open answer. ${levelInstr} Return ONLY valid JSON: {"score":0,"max":3,"feedback":"2-3 sentences of specific encouraging feedback."}  Score: 3=excellent, 2=good, 1=partial, 0=off-topic.`,
         `Question: ${currentQ.question}\nKey points: ${(currentQ.key_points||[]).join(", ")}\nStudent: ${openInput}`,
-        400
+        400,
+        lang
       );
       const parsed = parseQuizJson(raw);
       if (!parsed) throw new Error("bad grading response");
@@ -156,7 +159,8 @@ export default function QuizScreen({ lang, events, level }) {
       const fb = await callClaude(
         `You are a history teacher giving final quiz feedback. ${levelInstr} Be encouraging, mention 1-2 strengths and 1 area to study. 3-4 sentences max.`,
         `Student took quiz on: ${e?.name}. Score: ${score}/${maxScore} (${pct}%). Results: ${sum}`,
-        400
+        400,
+        lang
       );
       if (myReq === reqRef.current) setResultAnalysis(fb);
     } catch {
