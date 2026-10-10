@@ -102,7 +102,6 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
           {/* Actions */}
           <div style={{ display:"flex", gap:10, marginTop:8, flexWrap:"wrap" }}>
             <Btn onClick={onSave} variant="primary">{tx.modalAdd}</Btn>
-            <button type="button" onClick={onAsk} style={{ flex:1, minWidth:160, background:"#facc15", color:"#422006", border:"1px solid #eab308", borderRadius:12, padding:"12px 18px", fontSize:".92rem", fontWeight:800, cursor:"pointer", fontFamily:"inherit" }}>{tx.modalAsk}</button>
           </div>
         </div>
       </div>
