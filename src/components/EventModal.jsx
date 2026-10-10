@@ -7,12 +7,14 @@ import Btn from "./Btn";
 export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAsk }) {
   const [questions, setQuestions] = useState([]);
   const [openId, setOpenId] = useState(null);
+  const [showAllQ, setShowAllQ] = useState(false);
 
   // Prepared questions for this topic load lazily; a click shows the answer right here.
   useEffect(() => {
     if (!e) return;
     let active = true;
     setOpenId(null);
+    setShowAllQ(false);
     import("../constants/faq/index.js").then(m => { if (active) setQuestions(m.topicQuestions(e.id, lang)); });
     return () => { active = false; };
   }, [e?.id, lang]);
@@ -75,7 +77,7 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
             <div style={{ marginBottom:16 }}>
               <div style={{ fontSize:".78rem", fontWeight:800, color:T.textDim, marginBottom:8 }}>⚡ {tx.preparedLabel}</div>
               <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                {questions.slice(0, 6).map(q => (
+                {(showAllQ ? questions : questions.slice(0, 6)).map(q => (
                   <button key={q.id} type="button" onClick={() => setOpenId(id => id === q.id ? null : q.id)} style={{
                     background: openId === q.id ? T.gold : T.surface, color: openId === q.id ? "#ffffff" : T.gold,
                     border:`1px solid ${T.borderStrong}`, borderRadius:18, padding:"7px 13px", fontSize:".8rem",
@@ -83,6 +85,11 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
                   }}>{q.q}</button>
                 ))}
               </div>
+              {questions.length > 6 && (
+                <button type="button" onClick={() => setShowAllQ(v => !v)} style={{ marginTop:8, background:"transparent", border:`1px solid ${T.borderStrong}`, borderRadius:16, padding:"5px 12px", fontSize:".76rem", color:T.textDim, cursor:"pointer", fontFamily:"inherit" }}>
+                  {showAllQ ? tx.showLess : tx.showAll(questions.length)}
+                </button>
+              )}
               {openItem && (
                 <div style={{ marginTop:10, background:T.surface, border:`1px solid ${T.border}`, borderRadius:12, padding:"14px 16px" }}>
                   <div style={{ fontSize:".7rem", color:T.green, fontWeight:700, marginBottom:4 }}>{tx.preparedTag}</div>

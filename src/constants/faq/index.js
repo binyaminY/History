@@ -6,10 +6,11 @@ import moreA from "./more-a.js";
 import moreB from "./more-b.js";
 import moreC from "./more-c.js";
 import moreD from "./more-d.js";
+import moreE from "./more-e.js";
 
 // Each topic's prepared entries: the originals first, then the extra ones.
 const merged = {};
-for (const part of [a, b, c, d, moreA, moreB, moreC, moreD]) {
+for (const part of [a, b, c, d, moreA, moreB, moreC, moreD, moreE]) {
   for (const [topic, rows] of Object.entries(part)) merged[topic] = [...(merged[topic] || []), ...rows];
 }
 const DATA = merged;
