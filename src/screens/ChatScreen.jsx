@@ -23,7 +23,7 @@ function shuffle(list) {
   return copy;
 }
 
-export default function ChatScreen({ lang, topic = null, onClearTopic, events = [] }) {
+export default function ChatScreen({ lang, topic = null, onClearTopic, events = [], startItem = null, onStartConsumed }) {
   const isHe = lang === "he";
   const tx = TX[lang];
   const [faq, setFaq] = useState(null);
@@ -68,6 +68,13 @@ export default function ChatScreen({ lang, topic = null, onClearTopic, events = 
     ]);
     setInput("");
   };
+
+  // A question picked in the pop-up is answered as soon as the chat opens.
+  useEffect(() => {
+    if (!startItem) return;
+    answerPrepared(startItem);
+    onStartConsumed?.();
+  }, [startItem]);
 
   const send = async (text) => {
     const question = (text ?? input).trim().slice(0, MAX_QUESTION);
@@ -123,6 +130,26 @@ export default function ChatScreen({ lang, topic = null, onClearTopic, events = 
         </div>
       )}
 
+      {faq && (
+        <div style={{ padding:"10px 20px", borderBottom:`1px solid ${T.border}`, background:T.surface, flexShrink:0 }}>
+          <div style={{ maxWidth:640, margin:"0 auto" }}>
+            <div style={label}>{topic ? tx.preparedLabel : tx.popularLabel}</div>
+            <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+              {(topic ? visibleTopic : generalList).map(item => (
+                <button key={item.id} onClick={() => answerPrepared(item)} style={smallChip}>
+                  → {item.q}{!topic && <span style={{ color:T.textMuted }}> · {topicName(item.topic)}</span>}
+                </button>
+              ))}
+            </div>
+            {topic && topicList.length > TOPIC_PREVIEW && (
+              <button onClick={() => setShowAll(v => !v)} style={{ ...smallChip, marginTop:8, color:T.textDim }}>
+                {showAll ? tx.showLess : tx.showAll(topicList.length)}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div style={{ flex:1, overflowY:"auto", padding:"20px 26px", display:"flex", flexDirection:"column", gap:13 }}>
         {messages.length === 0 && (
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", padding:"20px 10px", maxWidth:640, margin:"0 auto", width:"100%" }}>
@@ -133,33 +160,6 @@ export default function ChatScreen({ lang, topic = null, onClearTopic, events = 
             <div style={{ fontSize:".95rem", color:T.textDim, lineHeight:1.8, marginBottom:22 }}>{tx.chatWelcomeBody}</div>
 
             {!faq && <Spinner size={20} />}
-
-            {faq && topic && (
-              <div style={{ width:"100%" }}>
-                <div style={label}>{tx.preparedLabel}</div>
-                <div style={{ display:"flex", flexDirection:"column", gap:8, alignItems:"stretch" }}>
-                  {visibleTopic.map(item => <button key={item.id} onClick={() => answerPrepared(item)} style={chip}>→ {item.q}</button>)}
-                </div>
-                {topicList.length > TOPIC_PREVIEW && (
-                  <button onClick={() => setShowAll(v => !v)} style={{ ...smallChip, marginTop:10, color:T.textDim }}>
-                    {showAll ? tx.showLess : tx.showAll(topicList.length)}
-                  </button>
-                )}
-              </div>
-            )}
-
-            {faq && !topic && (
-              <div style={{ width:"100%" }}>
-                <div style={label}>{tx.popularLabel}</div>
-                <div style={{ display:"flex", flexDirection:"column", gap:8, alignItems:"stretch" }}>
-                  {generalList.map(item => (
-                    <button key={item.id} onClick={() => answerPrepared(item)} style={chip}>
-                      → {item.q} <span style={{ color:T.textMuted, fontSize:".72rem" }}>· {topicName(item.topic)}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
 

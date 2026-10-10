@@ -9,6 +9,7 @@ import SavedScreen from "./screens/SavedScreen";
 import ChatScreen from "./screens/ChatScreen";
 import QuizScreen from "./screens/QuizScreen";
 import BackgroundArt from "./components/BackgroundArt";
+import AskPopup from "./components/AskPopup";
 
 const TEXT_SIZES = [100, 112, 125, 140];
 const DEFAULT_SIZE = 1;
@@ -26,6 +27,7 @@ export default function App() {
   const [toast, setToast] = useState("");
   const [modal, setModal] = useState(null);
   const [chatTopic, setChatTopic] = useState(null);
+  const [startItem, setStartItem] = useState(null);
   const [sizeIdx, setSizeIdx] = useState(() => {
     try {
       const v = Number(localStorage.getItem("hm_text_size"));
@@ -148,7 +150,7 @@ export default function App() {
 
       {screen === "home" && <HomeScreen lang={lang} events={events} level={level} onOpenEvent={id => setModal(id)} />}
       {screen === "timeline" && <TimelineScreen lang={lang} events={events} level={level} onOpenEvent={id => setModal(id)} />}
-      {screen === "chat" && <ChatScreen key={lang + (chatTopic?.id || "")} lang={lang} topic={chatTopic && { ...chatTopic, name: events.find(x => x.id === chatTopic.id)?.name || chatTopic.name }} onClearTopic={() => setChatTopic(null)} events={events} />}
+      {screen === "chat" && <ChatScreen key={lang + (chatTopic?.id || "")} lang={lang} topic={chatTopic && { ...chatTopic, name: events.find(x => x.id === chatTopic.id)?.name || chatTopic.name }} onClearTopic={() => setChatTopic(null)} events={events} startItem={startItem} onStartConsumed={() => setStartItem(null)} />}
       {screen === "saved" && <SavedScreen lang={lang} events={events} saved={saved} onRemove={removeItem} />}
       {screen === "quiz" && <QuizScreen lang={lang} events={events} level={level} />}
 
@@ -162,6 +164,14 @@ export default function App() {
           onAsk={() => openEventAndGoChat(modal)}
         />
       )}
+
+      <AskPopup
+        lang={lang}
+        events={events}
+        enabled={screen !== "chat" && !modal}
+        onPick={item => { setStartItem(item); setChatTopic(null); setScreen("chat"); }}
+        onOpenChat={() => { setChatTopic(null); setScreen("chat"); }}
+      />
 
       {toast && <div style={{
         position:"fixed", bottom:90, left:"50%", transform:"translateX(-50%)",

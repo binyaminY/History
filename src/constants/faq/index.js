@@ -2,8 +2,17 @@ import a from "./a.js";
 import b from "./b.js";
 import c from "./c.js";
 import d from "./d.js";
+import moreA from "./more-a.js";
+import moreB from "./more-b.js";
+import moreC from "./more-c.js";
+import moreD from "./more-d.js";
 
-const DATA = { ...a, ...b, ...c, ...d };
+// Each topic's prepared entries: the originals first, then the extra ones.
+const merged = {};
+for (const part of [a, b, c, d, moreA, moreB, moreC, moreD]) {
+  for (const [topic, rows] of Object.entries(part)) merged[topic] = [...(merged[topic] || []), ...rows];
+}
+const DATA = merged;
 
 const toItem = (topic, row, i, lang) => ({
   id: `${topic}-${i}`,

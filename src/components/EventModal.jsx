@@ -61,16 +61,16 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
 
           {/* Ask the AI about this topic */}
           <button type="button" onClick={onAsk} style={{
-            width:"100%", background:"linear-gradient(135deg,rgba(37,99,235,.12),rgba(37,99,235,.05))",
-            border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"14px 18px", marginBottom:14,
+            width:"100%", background:"#facc15",
+            border:"1px solid #eab308", borderRadius:12, padding:"14px 18px", marginBottom:14,
             cursor:"pointer", display:"flex", alignItems:"center", gap:12, fontFamily:"inherit", textAlign: isHe ? "right" : "left",
           }}>
             <span style={{ fontSize:"1.5rem", flexShrink:0 }}>🤖</span>
             <span style={{ flex:1 }}>
-              <span style={{ display:"block", fontSize:".9rem", fontWeight:700, color:T.gold, marginBottom:3 }}>{tx.askBannerTitle}</span>
-              <span style={{ display:"block", fontSize:".8rem", color:T.textDim }}>{tx.askBannerBody}</span>
+              <span style={{ display:"block", fontSize:".9rem", fontWeight:700, color:"#422006", marginBottom:3 }}>{tx.askBannerTitle}</span>
+              <span style={{ display:"block", fontSize:".8rem", color:"#713f12" }}>{tx.askBannerBody}</span>
             </span>
-            <span style={{ color:T.gold, fontSize:"1.1rem", flexShrink:0 }}>{isHe ? "‹" : "›"}</span>
+            <span style={{ color:"#422006", fontSize:"1.1rem", flexShrink:0 }}>{isHe ? "‹" : "›"}</span>
           </button>
 
           {/* Deep info button / content */}
@@ -102,7 +102,7 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
           {/* Actions */}
           <div style={{ display:"flex", gap:10, marginTop:8, flexWrap:"wrap" }}>
             <Btn onClick={onSave} variant="primary">{tx.modalAdd}</Btn>
-            <Btn onClick={onAsk} variant="secondary">{tx.modalAsk}</Btn>
+            <button type="button" onClick={onAsk} style={{ flex:1, minWidth:160, background:"#facc15", color:"#422006", border:"1px solid #eab308", borderRadius:12, padding:"12px 18px", fontSize:".92rem", fontWeight:800, cursor:"pointer", fontFamily:"inherit" }}>{tx.modalAsk}</button>
           </div>
         </div>
       </div>
