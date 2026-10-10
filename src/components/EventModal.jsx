@@ -1,3 +1,4 @@
+import SUBHEADS from "../constants/subheads";
 import { useState } from "react";
 import T from "../constants/theme";
 import TX, { tagLabel } from "../constants/translations";
@@ -44,7 +45,14 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
           {e.deep && (
             <div style={{ background:T.surface2, border:`1px solid ${T.border}`, borderRadius:12, padding:"18px 20px", marginBottom:16 }}>
               <div style={{ fontSize:".9rem", color:T.textDim, lineHeight:1.95, whiteSpace:"pre-line" }}>
-                {e.deep}
+                {e.deep.split("\n\n").map((part, i) => (
+                  <div key={i} style={{ marginBottom: i < 2 ? 14 : 0 }}>
+                    {SUBHEADS[e.id]?.[lang]?.[i] && (
+                      <div style={{ fontSize:".95rem", fontWeight:800, color:T.gold, marginBottom:4 }}>{SUBHEADS[e.id][lang][i]}</div>
+                    )}
+                    <div>{part}</div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
