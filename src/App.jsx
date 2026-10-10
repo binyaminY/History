@@ -6,6 +6,8 @@ import EventModal from "./components/EventModal";
 import HomeScreen from "./screens/HomeScreen";
 import TimelineScreen from "./screens/TimelineScreen";
 import SavedScreen from "./screens/SavedScreen";
+import ChatScreen from "./screens/ChatScreen";
+import QuizScreen from "./screens/QuizScreen";
 import BackgroundArt from "./components/BackgroundArt";
 
 const TEXT_SIZES = [100, 112, 125, 140];
@@ -23,6 +25,7 @@ export default function App() {
   });
   const [toast, setToast] = useState("");
   const [modal, setModal] = useState(null);
+  const [chatInitQ, setChatInitQ] = useState(null);
   const [sizeIdx, setSizeIdx] = useState(() => {
     try {
       const v = Number(localStorage.getItem("hm_text_size"));
@@ -62,10 +65,20 @@ export default function App() {
 
   const removeItem = (idx) => setSaved(s => s.filter((_,i) => i !== idx));
 
+  const openEventAndGoChat = (id) => {
+    const e = events.find(x => x.id === id);
+    if (!e) return;
+    setModal(null);
+    setChatInitQ(tx.askAbout + e.name);
+    setScreen("chat");
+  };
+
   const navTabs = [
     { id:"home", label:tx.navExplore },
     { id:"timeline", label:tx.navTimeline },
+    { id:"chat", label:tx.navChat },
     { id:"saved", label:tx.navSaved },
+    { id:"quiz", label:tx.navQuiz },
   ];
 
   const modalEvent = modal ? events.find(e => e.id === modal) : null;
@@ -102,7 +115,7 @@ export default function App() {
         </div>
         <div style={{ display:"flex", gap:3, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:11, padding:3, flexWrap:"wrap", justifyContent:"center" }}>
           {navTabs.map(tab => (
-            <button key={tab.id} onClick={() => setScreen(tab.id)} style={{
+            <button key={tab.id} onClick={() => { setScreen(tab.id); setChatInitQ(null); }} style={{
               padding:"6px 13px", borderRadius:8, border:"none",
               background: screen===tab.id ? T.gold : "transparent",
               color: screen===tab.id ? "#ffffff" : T.textDim,
@@ -135,7 +148,9 @@ export default function App() {
 
       {screen === "home" && <HomeScreen lang={lang} events={events} level={level} onOpenEvent={id => setModal(id)} />}
       {screen === "timeline" && <TimelineScreen lang={lang} events={events} level={level} onOpenEvent={id => setModal(id)} />}
+      {screen === "chat" && <ChatScreen key={lang + (chatInitQ || "")} lang={lang} level={level} initialQuestion={chatInitQ} />}
       {screen === "saved" && <SavedScreen lang={lang} events={events} saved={saved} onRemove={removeItem} />}
+      {screen === "quiz" && <QuizScreen lang={lang} events={events} level={level} />}
 
       {modalEvent && (
         <EventModal
@@ -144,6 +159,7 @@ export default function App() {
           isHe={isHe}
           onClose={() => setModal(null)}
           onSave={() => { saveEvent(modal); setModal(null); }}
+          onAsk={() => openEventAndGoChat(modal)}
         />
       )}
 

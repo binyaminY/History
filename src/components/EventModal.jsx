@@ -3,7 +3,7 @@ import T from "../constants/theme";
 import TX, { tagLabel } from "../constants/translations";
 import Btn from "./Btn";
 
-export default function EventModal({ event: e, lang, isHe, onClose, onSave }) {
+export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAsk }) {
   const [expanded, setExpanded] = useState(false);
   if (!e) return null;
   const tx = TX[lang];
@@ -82,12 +82,28 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave }) {
                   {e.deep}
                 </div>
               </div>
+              <div onClick={onAsk} style={{
+                background:"linear-gradient(135deg,rgba(37,99,235,.1),rgba(37,99,235,.05))",
+                border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"14px 18px",
+                cursor:"pointer", display:"flex", alignItems:"center", gap:12,
+              }}>
+                <span style={{ fontSize:"1.4rem", flexShrink:0 }}>💬</span>
+                <div>
+                  <div style={{ fontSize:".85rem", fontWeight:700, color:T.gold, marginBottom:3 }}>
+                    {isHe ? "רוצה לדעת עוד?" : "Want to know more?"}
+                  </div>
+                  <div style={{ fontSize:".78rem", color:T.textMuted }}>
+                    {isHe ? `שאל כל שאלה על "${e.name}"` : `Ask any question about "${e.name}"`}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Actions */}
           <div style={{ display:"flex", gap:10, marginTop:8, flexWrap:"wrap" }}>
             <Btn onClick={onSave} variant="primary">{tx.modalAdd}</Btn>
+            <Btn onClick={onAsk} variant="secondary">{tx.modalAsk}</Btn>
           </div>
         </div>
       </div>
