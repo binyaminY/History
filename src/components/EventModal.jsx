@@ -58,6 +58,15 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
             </div>
           </div>
 
+          {/* Extended summary as one plain text bubble */}
+          {e.deep && (
+            <div style={{ background:T.surface2, border:`1px solid ${T.border}`, borderRadius:12, padding:"18px 20px", marginBottom:16 }}>
+              <div style={{ fontSize:".9rem", color:T.textDim, lineHeight:1.95, whiteSpace:"pre-line" }}>
+                {e.deep}
+              </div>
+            </div>
+          )}
+
           {/* Ask the AI about this topic */}
           <button type="button" onClick={onAsk} style={{
             width:"100%", background:"#facc15",
@@ -71,15 +80,6 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
             </span>
             <span style={{ color:"#422006", fontSize:"1.1rem", flexShrink:0 }}>{isHe ? "‹" : "›"}</span>
           </button>
-          {/* Extended summary as one plain text bubble */}
-          {e.deep && (
-            <div style={{ background:T.surface2, border:`1px solid ${T.border}`, borderRadius:12, padding:"18px 20px", marginBottom:16 }}>
-              <div style={{ fontSize:".9rem", color:T.textDim, lineHeight:1.95, whiteSpace:"pre-line" }}>
-                {e.deep}
-              </div>
-            </div>
-          )}
-
           {/* Actions */}
           <div style={{ display:"flex", gap:10, marginTop:8, flexWrap:"wrap" }}>
             <Btn onClick={onSave} variant="primary">{tx.modalAdd}</Btn>
