@@ -3,7 +3,6 @@ import TX, { tagLabel } from "../constants/translations";
 import { LEVEL_ORDER } from "../constants/events";
 import eventImageUrl from "../constants/eventImages";
 import SectionLabel from "../components/SectionLabel";
-import { PROMO_URL } from "../constants/links";
 
 export default function HomeScreen({ lang, events, level, onOpenEvent }) {
   const isHe = lang === "he";
@@ -24,13 +23,6 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
           {tx.heroTag}
         </div>
         <p style={{ color:T.textDim, fontSize:".9rem", maxWidth:460, margin:"0 auto 0", lineHeight:1.7 }}>{tx.heroSub}</p>
-        <a href={PROMO_URL} target="_blank" rel="noopener noreferrer" aria-label={tx.promoAria} style={{
-          display:"inline-flex", alignItems:"center", gap:8, marginTop:18, padding:"9px 20px",
-          background:T.gold, color:"#fff", borderRadius:24, fontSize:".88rem", fontWeight:700,
-          textDecoration:"none", boxShadow:"0 2px 8px rgba(37,99,235,.25)",
-        }}>
-          <span aria-hidden="true">▶</span>{tx.promo}
-        </a>
         <p style={{ color:T.textDim, fontSize:".88rem", marginTop:16 }}>
           {tx.createdBy}
         </p>
