@@ -99,6 +99,8 @@ const TX = {
     eventsCount: (n) => `${n} אירועים`,
     library: "הספרייה שלכם",
     createdBy: "האפליקציה נוצרה על ידי בנימין יונה",
+    promo: "פרומו",
+    promoAria: "צפייה בסרטון הפרומו ביוטיוב (נפתח בלשונית חדשה)",
   },
   en: {
     navExplore: "🏛 Events",
@@ -200,6 +202,8 @@ const TX = {
     eventsCount: (n) => `${n} events`,
     library: "Your Library",
     createdBy: "Created by Binyamin Yona",
+    promo: "Promo",
+    promoAria: "Watch the promo video on YouTube (opens in a new tab)",
   },
 };
 
