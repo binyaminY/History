@@ -3,8 +3,7 @@ import TX, { tagLabel } from "../constants/translations";
 import { LEVEL_ORDER } from "../constants/events";
 import eventImageUrl from "../constants/eventImages";
 import SectionLabel from "../components/SectionLabel";
-
-const PROMO_URL = "https://www.youtube.com/watch?v=lgujXrDOTFw";
+import { PROMO_URL } from "../constants/links";
 
 export default function HomeScreen({ lang, events, level, onOpenEvent }) {
   const isHe = lang === "he";

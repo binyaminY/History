@@ -10,6 +10,7 @@ import ChatScreen from "./screens/ChatScreen";
 import QuizScreen from "./screens/QuizScreen";
 import BackgroundArt from "./components/BackgroundArt";
 import AskPopup from "./components/AskPopup";
+import { PROMO_URL } from "./constants/links";
 
 const TEXT_SIZES = [100, 112, 125, 140];
 const DEFAULT_SIZE = 1;
@@ -127,6 +128,13 @@ export default function App() {
           ))}
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <a href={PROMO_URL} target="_blank" rel="noopener noreferrer" aria-label={tx.promoAria} style={{
+            display:"inline-flex", alignItems:"center", gap:6, whiteSpace:"nowrap",
+            background:T.gold, color:"#ffffff", borderRadius:20, padding:"6px 14px",
+            fontSize:".79rem", fontWeight:700, textDecoration:"none", fontFamily:"inherit",
+          }}>
+            <span aria-hidden="true">▶</span>{tx.promo}
+          </a>
           <div role="group" aria-label={isHe ? "גודל טקסט" : "Text size"} style={{ display:"flex", alignItems:"center", gap:2, background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20, padding:2 }}>
             <button onClick={() => setSizeIdx(i => Math.max(0, i - 1))} disabled={sizeIdx === 0}
               aria-label={isHe ? "הקטן טקסט" : "Smaller text"} style={{
