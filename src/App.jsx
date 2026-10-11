@@ -11,6 +11,7 @@ import QuizScreen from "./screens/QuizScreen";
 import BackgroundArt from "./components/BackgroundArt";
 import AskPopup from "./components/AskPopup";
 import { PROMO_URL } from "./constants/links";
+import logoMark from "./images/logo-mark.png";
 
 const TEXT_SIZES = [100, 112, 125, 140];
 const DEFAULT_SIZE = 1;
@@ -113,8 +114,9 @@ export default function App() {
         background:"rgba(255,255,255,.98)", backdropFilter:"blur(20px)",
         position:"sticky", top:0, zIndex:100, flexWrap:"wrap", gap:8,
       }}>
-        <div style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"1.35rem", fontWeight:900, color:T.gold }}>
-          HistoryWith<span style={{ color:T.text }}>Ben</span>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <img src={logoMark} alt="" aria-hidden="true" style={{ height:40, width:"auto", display:"block" }} />
+          <span style={{ fontFamily:"Georgia,'Times New Roman',serif", fontSize:"1.3rem", fontWeight:600, color:"#1e3a5f", letterSpacing:"-.01em" }}>history with ben</span>
         </div>
         <div style={{ display:"flex", gap:3, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:11, padding:3, flexWrap:"wrap", justifyContent:"center" }}>
           {navTabs.map(tab => (
