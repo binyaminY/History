@@ -194,7 +194,7 @@ function Saladin({ x, y, scale = 1, op = 0.09 }) {
 
 export default function BackgroundArt() {
   return (
-    <div style={{ position:"fixed", inset:0, zIndex:0, pointerEvents:"none", overflow:"hidden" }}>
+    <div className="hm-art" aria-hidden="true" style={{ position:"fixed", inset:0, zIndex:0, pointerEvents:"none", overflow:"hidden" }}>
       <svg width="100%" height="100%"
         viewBox="0 0 1440 900"
         preserveAspectRatio="xMidYMid slice"

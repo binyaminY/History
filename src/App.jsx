@@ -10,6 +10,7 @@ import ChatScreen from "./screens/ChatScreen";
 import QuizScreen from "./screens/QuizScreen";
 import BackgroundArt from "./components/BackgroundArt";
 import AskPopup from "./components/AskPopup";
+import SettingsPanel, { TEXT_SIZES, DEFAULT_PREFS } from "./components/SettingsPanel";
 import { PROMO_URL } from "./constants/links";
 import logoMark from "./images/logo-mark.png";
 
@@ -24,8 +25,6 @@ function parseHash() {
   return { screen: "home", modal: null };
 }
 
-const TEXT_SIZES = [100, 112, 125, 140];
-const DEFAULT_SIZE = 1;
 
 export default function App() {
   const [lang, setLang] = useState(() => {
@@ -44,12 +43,23 @@ export default function App() {
   const pushedRef = useRef(false);
   const [chatTopic, setChatTopic] = useState(null);
   const [startItem, setStartItem] = useState(null);
-  const [sizeIdx, setSizeIdx] = useState(() => {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [prefs, setPrefs] = useState(() => {
+    const base = { ...DEFAULT_PREFS };
     try {
-      const v = Number(localStorage.getItem("hm_text_size"));
-      return Number.isInteger(v) && v >= 0 && v < TEXT_SIZES.length ? v : DEFAULT_SIZE;
-    } catch { return DEFAULT_SIZE; }
+      base.motion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      base.contrast = window.matchMedia("(prefers-contrast: more)").matches;
+      const old = Number(localStorage.getItem("hm_text_size"));
+      if (Number.isInteger(old) && old >= 0 && old < TEXT_SIZES.length) base.size = old;
+      const saved = JSON.parse(localStorage.getItem("hm_prefs") || "null");
+      if (saved && typeof saved === "object") {
+        for (const k of Object.keys(DEFAULT_PREFS)) if (typeof saved[k] === typeof DEFAULT_PREFS[k]) base[k] = saved[k];
+        if (!(base.size >= 0 && base.size < TEXT_SIZES.length)) base.size = DEFAULT_PREFS.size;
+      }
+    } catch {}
+    return base;
   });
+  const setPref = (k, v) => setPrefs(p => ({ ...p, [k]: v }));
 
   const isHe = lang === "he";
   const tx = TX[lang];
@@ -110,10 +120,13 @@ export default function App() {
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", t === "dark" ? "#0b1220" : "#2563eb");
     setThemeState(t);
   };
-  const toggleTheme = () => {
-    const t = theme === "dark" ? "light" : "dark";
-    applyTheme(t);
-    try { localStorage.setItem("hm_theme", t); } catch {}
+  const [themePref, setThemePrefState] = useState(() => {
+    try { const v = localStorage.getItem("hm_theme"); return v === "dark" || v === "light" ? v : "system"; } catch { return "system"; }
+  });
+  const setThemePref = (v) => {
+    setThemePrefState(v);
+    try { v === "system" ? localStorage.removeItem("hm_theme") : localStorage.setItem("hm_theme", v); } catch {}
+    applyTheme(v === "system" ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : v);
   };
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -126,10 +139,24 @@ export default function App() {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  // Display preferences become data attributes on <html>; the CSS below reacts to them.
   useEffect(() => {
-    document.documentElement.style.fontSize = TEXT_SIZES[sizeIdx] + "%";
-    try { localStorage.setItem("hm_text_size", String(sizeIdx)); } catch {}
-  }, [sizeIdx]);
+    const d = document.documentElement;
+    d.style.fontSize = TEXT_SIZES[prefs.size] + "%";
+    d.dataset.contrast = prefs.contrast ? "high" : "normal";
+    d.dataset.motion = prefs.motion ? "reduce" : "normal";
+    d.dataset.art = prefs.art ? "on" : "off";
+    d.dataset.links = prefs.links ? "underline" : "normal";
+    d.dataset.font = prefs.font ? "readable" : "normal";
+    d.dataset.spacing = prefs.spacing ? "wide" : "normal";
+    d.dataset.focus = prefs.focus ? "strong" : "normal";
+    try { localStorage.setItem("hm_prefs", JSON.stringify(prefs)); } catch {}
+  }, [prefs]);
+
+  const resetPrefs = () => {
+    setPrefs({ ...DEFAULT_PREFS });
+    setThemePref("system");
+  };
 
   const saveEvent = (id) => {
     const e = events.find(x => x.id === id);
@@ -183,6 +210,17 @@ export default function App() {
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
         }
+        html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-motion="reduce"] *::after {
+          animation: none !important; transition: none !important; scroll-behavior: auto !important;
+        }
+        html[data-art="off"] .hm-art { display: none !important; }
+        html[data-links="underline"] a { text-decoration: underline !important; text-underline-offset: 3px; }
+        html[data-font="readable"] body, html[data-font="readable"] body * { font-family: Arial, "Helvetica Neue", Helvetica, sans-serif !important; }
+        html[data-spacing="wide"] body * { line-height: 1.9 !important; word-spacing: .14em !important; }
+        html[data-spacing="wide"][lang="en"] body * { letter-spacing: .04em !important; }
+        html[data-focus="strong"] :focus-visible { outline: 4px solid var(--hm-accent) !important; outline-offset: 3px !important; box-shadow: 0 0 0 7px var(--hm-bg) !important; }
+        html[data-contrast="high"] body * { border-color: var(--hm-text) !important; }
+        html[data-contrast="high"] button, html[data-contrast="high"] [role="button"] { border-width: 2px !important; }
         @media (max-width: 640px) {
           .hm-nav { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; position: static !important; padding-top: max(10px, env(safe-area-inset-top)) !important; padding-bottom: 10px !important; }
           .hm-tabs {
@@ -234,25 +272,12 @@ export default function App() {
           }}>
             <span aria-hidden="true">▶</span>{tx.promo}
           </a>
-          <div role="group" aria-label={isHe ? "גודל טקסט" : "Text size"} style={{ display:"flex", alignItems:"center", gap:2, background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20, padding:2 }}>
-            <button onClick={() => setSizeIdx(i => Math.max(0, i - 1))} disabled={sizeIdx === 0}
-              aria-label={isHe ? "הקטן טקסט" : "Smaller text"} style={{
-              background:"transparent", border:"none", borderRadius:16, width:30, height:28,
-              color: sizeIdx === 0 ? T.textMuted : T.gold, cursor: sizeIdx === 0 ? "default" : "pointer",
-              fontSize:".78rem", fontWeight:700, fontFamily:"inherit",
-            }}>A−</button>
-            <button onClick={() => setSizeIdx(i => Math.min(TEXT_SIZES.length - 1, i + 1))} disabled={sizeIdx === TEXT_SIZES.length - 1}
-              aria-label={isHe ? "הגדל טקסט" : "Larger text"} style={{
-              background:"transparent", border:"none", borderRadius:16, width:30, height:28,
-              color: sizeIdx === TEXT_SIZES.length - 1 ? T.textMuted : T.gold, cursor: sizeIdx === TEXT_SIZES.length - 1 ? "default" : "pointer",
-              fontSize:"1.02rem", fontWeight:700, fontFamily:"inherit",
-            }}>A+</button>
-          </div>
-          <button onClick={toggleTheme} aria-pressed={theme === "dark"}
-            aria-label={isHe ? "מצב כהה" : "Dark mode"} title={isHe ? "מצב כהה" : "Dark mode"} style={{
-            background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20, width:36, height:32,
-            fontSize:"1rem", color:T.gold, cursor:"pointer", fontFamily:"inherit", display:"grid", placeItems:"center",
-          }}><span aria-hidden="true">{theme === "dark" ? "☀️" : "🌙"}</span></button>
+          <button onClick={() => setSettingsOpen(true)} aria-haspopup="dialog" aria-expanded={settingsOpen}
+            aria-label={isHe ? "הגדרות נגישות והצגה" : "Accessibility and display settings"} style={{
+            background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20,
+            padding:"5px 13px", fontSize:".79rem", fontWeight:700, color:T.gold, cursor:"pointer", fontFamily:"inherit",
+            display:"inline-flex", alignItems:"center", gap:6, whiteSpace:"nowrap",
+          }}><span aria-hidden="true">⚙️</span>{isHe ? "הגדרות" : "Settings"}</button>
           <button onClick={() => setLang(l => l==="he"?"en":"he")} lang={isHe ? "en" : "he"} style={{
             background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20,
             padding:"5px 13px", fontSize:".79rem", color:T.gold, cursor:"pointer", fontFamily:"inherit",
@@ -278,6 +303,9 @@ export default function App() {
           onAsk={() => openEventAndGoChat(modal)}
         />
       )}
+
+      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} isHe={isHe}
+        prefs={prefs} setPref={setPref} themePref={themePref} setThemePref={setThemePref} onReset={resetPrefs} />
 
       <AskPopup
         lang={lang}
