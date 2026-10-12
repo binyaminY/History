@@ -179,10 +179,12 @@ export default function App() {
         background:"rgba(255,255,255,.98)", backdropFilter:"blur(20px)",
         position:"sticky", top:0, zIndex:100, flexWrap:"wrap", gap:8,
       }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+        <button onClick={() => { setModal(null); go("home"); setChatTopic(null); }}
+          aria-label={isHe ? "חזרה לדף הבית" : "Back to home"}
+          style={{ display:"flex", alignItems:"center", gap:10, background:"none", border:"none", padding:0, cursor:"pointer", fontFamily:"inherit" }}>
           <img src={logoMark} alt="" aria-hidden="true" style={{ height:40, width:"auto", display:"block" }} />
           <span style={{ fontFamily:"Georgia,'Times New Roman',serif", fontSize:"1.3rem", fontWeight:600, color:"#1e3a5f", letterSpacing:"-.01em" }}>history with ben</span>
-        </div>
+        </button>
         <div className="hm-tabs" style={{ display:"flex", gap:3, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:11, padding:3, flexWrap:"wrap", justifyContent:"center" }}>
           {navTabs.map(tab => (
             <button key={tab.id} onClick={() => { go(tab.id); setChatTopic(null); }} style={{
