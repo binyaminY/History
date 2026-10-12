@@ -118,7 +118,9 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
                     }} />
 
                     <div
+                      role="button" tabIndex={0} aria-label={e.name}
                       onClick={() => onOpenEvent(e.id)}
+                      onKeyDown={ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onOpenEvent(e.id); } }}
                       style={{
                         background:T.surface,
                         border:`1px solid ${T.border}`,

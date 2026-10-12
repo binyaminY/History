@@ -1,5 +1,5 @@
 import SUBHEADS from "../constants/subheads";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import T from "../constants/theme";
 import TX, { tagLabel } from "../constants/translations";
 import Btn from "./Btn";
@@ -8,6 +8,16 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
   const [questions, setQuestions] = useState([]);
   const [openId, setOpenId] = useState(null);
   const [showAllQ, setShowAllQ] = useState(false);
+  const closeRef = useRef(null);
+
+  // Escape closes the window, and the close button gets the focus when it opens.
+  useEffect(() => {
+    if (!e) return;
+    const onKey = (ev) => { if (ev.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    closeRef.current?.focus();
+    return () => document.removeEventListener("keydown", onKey);
+  }, [e?.id]);
 
   // Prepared questions for this topic load lazily; a click shows the answer right here.
   useEffect(() => {
@@ -24,7 +34,7 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
   const openItem = questions.find(q => q.id === openId);
 
   return (
-    <div onClick={onClose} style={{
+    <div onClick={onClose} role="dialog" aria-modal="true" aria-label={e.name} style={{
       position:"fixed", inset:0, background:"rgba(15,23,42,.55)", backdropFilter:"blur(6px)",
       zIndex:500, display:"flex", alignItems:"center", justifyContent:"center", padding:20,
     }}>
@@ -51,7 +61,7 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
               <div style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"1.9rem", fontWeight:900, lineHeight:1.2, marginBottom:8 }}>{e.name}</div>
               <div style={{ color:T.gold, fontSize:".88rem", fontWeight:600 }}>📅 {e.year}</div>
             </div>
-            <button onClick={onClose} style={{ background:T.surface3, border:`1px solid ${T.border}`, borderRadius:10, width:34, height:34, cursor:"pointer", color:T.textMuted, fontSize:"1rem", display:"grid", placeItems:"center", flexShrink:0 }}>✕</button>
+            <button ref={closeRef} onClick={onClose} aria-label={tx.closeLabel} style={{ background:T.surface3, border:`1px solid ${T.border}`, borderRadius:10, width:34, height:34, cursor:"pointer", color:T.textMuted, fontSize:"1rem", display:"grid", placeItems:"center", flexShrink:0 }}>✕</button>
           </div>
         </div>
 

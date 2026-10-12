@@ -51,7 +51,7 @@ export default function AskPopup({ lang, enabled, events = [], onPick, onOpenCha
   if (dismissed) {
     // After the bubble is closed, a small yellow button keeps the chat one tap away.
     return (
-      <button onClick={onOpenChat} aria-label={tx.askPopupOpen} style={{ ...pos, width:52, height:52, borderRadius:26, border:`1px solid ${YELLOW_BORDER}`, background:YELLOW, color:YELLOW_TEXT, fontSize:"1.4rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(0,0,0,.25)" }}>
+      <button className="hm-fab" onClick={onOpenChat} aria-label={tx.askPopupOpen} style={{ ...pos, width:52, height:52, borderRadius:26, border:`1px solid ${YELLOW_BORDER}`, background:YELLOW, color:YELLOW_TEXT, fontSize:"1.4rem", cursor:"pointer", boxShadow:"0 6px 20px rgba(0,0,0,.25)" }}>
         🤖
       </button>
     );
@@ -63,7 +63,7 @@ export default function AskPopup({ lang, enabled, events = [], onPick, onOpenCha
   const chip = { background:"#ffffff", border:`1px solid ${YELLOW_BORDER}`, borderRadius:12, padding:"9px 12px", fontSize:".84rem", color:YELLOW_TEXT, cursor:"pointer", fontFamily:"inherit", textAlign: isHe ? "right" : "left", lineHeight:1.5 };
 
   return (
-    <div role="dialog" aria-label={tx.askPopupTitle} dir={isHe ? "rtl" : "ltr"} style={{
+    <div className="hm-fab" role="dialog" aria-label={tx.askPopupTitle} dir={isHe ? "rtl" : "ltr"} style={{
       ...pos, width:"min(340px, calc(100vw - 32px))", background:YELLOW,
       border:`1px solid ${YELLOW_BORDER}`, borderRadius:16, padding:"16px 16px 14px",
       boxShadow:"0 14px 40px rgba(0,0,0,.3)", animation:"hm-pop .35s ease-out", color:YELLOW_TEXT,

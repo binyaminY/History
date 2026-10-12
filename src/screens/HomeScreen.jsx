@@ -1,3 +1,4 @@
+import { useState } from "react";
 import T from "../constants/theme";
 import TX, { tagLabel } from "../constants/translations";
 import { LEVEL_ORDER } from "../constants/events";
@@ -8,7 +9,14 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
   const isHe = lang === "he";
   const tx = TX[lang];
   const currentLevelNum = LEVEL_ORDER[level] ?? 1;
-  const filtered = events.filter(e => (LEVEL_ORDER[e.level] ?? 0) <= currentLevelNum);
+  const [query, setQuery] = useState("");
+  const [era, setEra] = useState("all");
+  const eras = [...new Set(events.map(e => e.era))];
+  const q = query.trim().toLowerCase();
+  const filtered = events
+    .filter(e => (LEVEL_ORDER[e.level] ?? 0) <= currentLevelNum)
+    .filter(e => era === "all" || e.era === era)
+    .filter(e => !q || `${e.name} ${e.desc} ${e.era} ${e.year} ${(e.quick || []).join(" ")}`.toLowerCase().includes(q));
 
   return (
     <div style={{ flex:1, overflowY:"auto" }}>
@@ -30,10 +38,28 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
 
       <div style={{ padding:"24px 28px", maxWidth:1040, margin:"0 auto" }}>
 
+        <input
+          type="search" value={query} onChange={ev => setQuery(ev.target.value)}
+          placeholder={tx.searchTopics} aria-label={tx.searchTopics}
+          style={{ width:"100%", padding:"12px 16px", fontSize:"16px", fontFamily:"inherit", color:T.text, background:T.surface, border:`1px solid ${T.borderStrong}`, borderRadius:12, outline:"none", marginBottom:12 }}
+        />
+        <div style={{ display:"flex", gap:7, overflowX:"auto", paddingBottom:8, marginBottom:14 }}>
+          {[["all", tx.allEras], ...eras.map(x => [x, x])].map(([key, label]) => (
+            <button key={key} onClick={() => setEra(key)} aria-pressed={era === key} style={{
+              flexShrink:0, padding:"6px 14px", fontSize:".78rem", fontFamily:"inherit", cursor:"pointer", borderRadius:20,
+              background: era === key ? T.gold : T.surface, color: era === key ? "#ffffff" : T.textDim,
+              border:`1px solid ${era === key ? T.gold : T.borderStrong}`, fontWeight: era === key ? 700 : 500, whiteSpace:"nowrap",
+            }}>{label}</button>
+          ))}
+        </div>
         <SectionLabel>{tx.exploreLabel} <span style={{ fontSize:".65rem", fontWeight:400, letterSpacing:0, color:T.textMuted, marginRight:6 }}>{tx.exploreHint}</span></SectionLabel>
+        {filtered.length === 0 && <div style={{ textAlign:"center", color:T.textMuted, padding:"40px 0", fontSize:".9rem" }}>{tx.noTopics}</div>}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))", gap:13 }}>
           {filtered.map(e => (
-            <div key={e.id} onClick={() => onOpenEvent(e.id)} style={{
+            <div key={e.id} role="button" tabIndex={0} aria-label={e.name}
+              onClick={() => onOpenEvent(e.id)}
+              onKeyDown={ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onOpenEvent(e.id); } }}
+              style={{
               background:T.surface, border:`1px solid ${T.border}`,
               borderRadius:12, overflow:"hidden", cursor:"pointer", transition:"all .2s",
             }}>

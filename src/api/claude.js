@@ -27,7 +27,3 @@ async function postChat(payload) {
 export function askHistoryAI({ lang, topic, question, history = [] }) {
   return postChat({ kind: "chat", lang, topic: topic || "", question, history });
 }
-
-export function callClaude(system, userMsg, maxTokens = 400, lang = "he") {
-  return postChat({ kind: "quiz", lang, system, userMsg, maxTokens });
-}

@@ -3,12 +3,8 @@ import Groq from "groq-sdk";
 // The 20b model produced inaccurate, garbled Hebrew, so chat also uses 120b;
 // answers stay short through the prompt and the token cap.
 const CHAT_MODEL = process.env.GROQ_CHAT_MODEL || "openai/gpt-oss-120b";
-const QUIZ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 
-const LIMITS = {
-  chat: Number(process.env.IP_DAILY_LIMIT_CHAT || 15),
-  quiz: Number(process.env.IP_DAILY_LIMIT_QUIZ || 30),
-};
+const IP_DAILY_LIMIT = Number(process.env.IP_DAILY_LIMIT_CHAT || 15);
 const GLOBAL_DAILY_LIMIT = Number(process.env.GLOBAL_DAILY_LIMIT || 300);
 
 const CHAT_MAX_QUESTION = 300;
@@ -16,10 +12,6 @@ const CHAT_MAX_TOPIC = 120;
 const CHAT_MAX_HISTORY = 4;
 const CHAT_MAX_HISTORY_ITEM = 400;
 const CHAT_MAX_TOKENS = 300;
-
-const QUIZ_MAX_SYSTEM = 3000;
-const QUIZ_MAX_USER = 3000;
-const QUIZ_MAX_TOKENS = 600;
 
 const MESSAGES = {
   he: {
@@ -94,29 +86,18 @@ function parseChat(body) {
   };
 }
 
-function parseQuiz(body) {
-  const { system, userMsg, maxTokens } = body;
-  if (typeof system !== "string" || system.length > QUIZ_MAX_SYSTEM) return null;
-  if (typeof userMsg !== "string" || !userMsg.trim() || userMsg.length > QUIZ_MAX_USER) return null;
-  const lang = body.lang === "en" ? "en" : "he";
-  const tokens = Number(maxTokens) > 0 ? Math.min(Math.floor(Number(maxTokens)), QUIZ_MAX_TOKENS) : 400;
-  return {
-    kind: "quiz", lang, question: userMsg,
-    model: QUIZ_MODEL, tokens,
-    messages: [{ role: "system", content: system }, { role: "user", content: userMsg }],
-  };
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   const body = req.body && typeof req.body === "object" ? req.body : null;
   if (!body) return res.status(400).json({ error: "Invalid request" });
 
-  const input = body.kind === "chat" ? parseChat(body) : parseQuiz(body);
+  // Only the chat question is accepted. The instructions given to the model live on the server,
+  // so the endpoint cannot be used as a free general-purpose AI.
+  const input = body.kind === "chat" ? parseChat(body) : null;
   if (!input) return res.status(400).json({ error: "Invalid request" });
   const msg = MESSAGES[input.lang];
 
-  if (input.kind === "chat" && MEDIA_REQUEST.test(input.question)) {
+  if (MEDIA_REQUEST.test(input.question)) {
     return res.json({ text: msg.noImages });
   }
 
@@ -126,7 +107,7 @@ export default async function handler(req, res) {
 
   try {
     const day = new Date().toISOString().slice(0, 10);
-    const ipKey = `rl:ip:${input.kind}:${clientIp(req)}:${day}`;
+    const ipKey = `rl:ip:chat:${clientIp(req)}:${day}`;
     const globalKey = `rl:global:${day}`;
     const replies = await redisPipeline([
       ["INCR", ipKey],
@@ -137,7 +118,7 @@ export default async function handler(req, res) {
     if (!Array.isArray(replies) || replies.some(r => r.error || typeof r.result === "undefined")) {
       return res.status(503).json({ error: msg.unavailable });
     }
-    if (Number(replies[0].result) > LIMITS[input.kind]) return res.status(429).json({ error: msg.ipLimit });
+    if (Number(replies[0].result) > IP_DAILY_LIMIT) return res.status(429).json({ error: msg.ipLimit });
     if (Number(replies[2].result) > GLOBAL_DAILY_LIMIT) return res.status(429).json({ error: msg.globalLimit });
 
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -149,7 +130,7 @@ export default async function handler(req, res) {
     });
     let text = (completion.choices[0]?.message?.content || "").trim();
     text = text.replace(/([א-ת])"([א-ת])/g, "$1'$2");
-    if (!text) text = input.kind === "chat" ? msg.empty : "";
+    if (!text) text = msg.empty;
     return res.json({ text });
   } catch (err) {
     console.error(err);
