@@ -49,7 +49,8 @@ export default function App() {
     try {
       base.motion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       base.contrast = window.matchMedia("(prefers-contrast: more)").matches;
-      const old = Number(localStorage.getItem("hm_text_size"));
+      const oldRaw = localStorage.getItem("hm_text_size");
+      const old = oldRaw === null ? NaN : Number(oldRaw);
       if (Number.isInteger(old) && old >= 0 && old < TEXT_SIZES.length) base.size = old;
       const saved = JSON.parse(localStorage.getItem("hm_prefs") || "null");
       if (saved && typeof saved === "object") {
