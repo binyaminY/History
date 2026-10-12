@@ -44,14 +44,6 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
             <span style={{ color:"#fbbf24" }}>{tx.heroTitleEm}</span>
           </h1>
           <p style={{ color:"#b6c2dc", fontSize:"clamp(.95rem,2.2vw,1.1rem)", maxWidth:520, margin:"0 auto", lineHeight:1.75 }}>{tx.heroSub}</p>
-          <div style={{ display:"flex", justifyContent:"center", gap:12, marginTop:28, flexWrap:"wrap" }}>
-            {[[events.length, isHe ? "נושאים" : "Topics"], [eras.length, isHe ? "תקופות" : "Eras"]].map(([n, label]) => (
-              <div key={label} style={{ display:"flex", alignItems:"baseline", gap:8, padding:"8px 18px", borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)" }}>
-                <span style={{ fontFamily:"'Rubik','Heebo',sans-serif", fontSize:"1.4rem", fontWeight:800, color:"#ffffff" }}>{n}</span>
-                <span style={{ fontSize:".82rem", color:"#9fb0d0" }}>{label}</span>
-              </div>
-            ))}
-          </div>
           <p style={{ color:"#7f8fb0", fontSize:".78rem", marginTop:22 }}>{tx.createdBy}</p>
         </div>
       </div>
