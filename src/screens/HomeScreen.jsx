@@ -44,7 +44,6 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
             <span style={{ color:"#fbbf24" }}>{tx.heroTitleEm}</span>
           </h1>
           <p style={{ color:"#b6c2dc", fontSize:"clamp(.95rem,2.2vw,1.1rem)", maxWidth:520, margin:"0 auto", lineHeight:1.75 }}>{tx.heroSub}</p>
-          <p style={{ color:"#7f8fb0", fontSize:".78rem", marginTop:22 }}>{tx.createdBy}</p>
         </div>
       </div>
 
