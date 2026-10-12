@@ -21,9 +21,44 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Rubik:wght@500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script>
+      // Pick the theme before first paint so there is no white flash in dark mode.
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem("hm_theme"); } catch (e) {}
+        if (t !== "dark" && t !== "light") t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
     <style>
+      :root {
+        color-scheme: light;
+        --hm-bg:#ffffff; --hm-surface:#f8f8f8; --hm-surface2:#f0f0f0; --hm-surface3:#e8e8e8;
+        --hm-accent:#2563eb; --hm-accent-light:#3b82f6; --hm-accent-dim:#1e40af; --hm-on-accent:#ffffff;
+        --hm-accent-soft:rgba(37,99,235,.1);
+        --hm-text:#374151; --hm-text-dim:#4b5563; --hm-text-muted:#5f6673;
+        --hm-red:#dc2626; --hm-red-soft:rgba(220,38,38,.08);
+        --hm-green:#15803d; --hm-green-soft:rgba(21,128,61,.08);
+        --hm-border:rgba(37,99,235,.12); --hm-border-strong:rgba(37,99,235,.28);
+        --hm-nav-bg:rgba(255,255,255,.98); --hm-logo:#1e3a5f;
+        --hm-modal-head:linear-gradient(135deg,#dbeafe,#eff6ff);
+        --hm-art-opacity:1;
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --hm-bg:#0b1220; --hm-surface:#131c31; --hm-surface2:#1a2540; --hm-surface3:#243152;
+        --hm-accent:#60a5fa; --hm-accent-light:#93c5fd; --hm-accent-dim:#3b82f6; --hm-on-accent:#0b1220;
+        --hm-accent-soft:rgba(96,165,250,.16);
+        --hm-text:#e2e8f0; --hm-text-dim:#b4c0d4; --hm-text-muted:#9aa8bf;
+        --hm-red:#f87171; --hm-red-soft:rgba(248,113,113,.12);
+        --hm-green:#4ade80; --hm-green-soft:rgba(74,222,128,.12);
+        --hm-border:rgba(148,163,184,.18); --hm-border-strong:rgba(148,163,184,.38);
+        --hm-nav-bg:rgba(11,18,32,.96); --hm-logo:#e2e8f0;
+        --hm-modal-head:linear-gradient(135deg,#17254a,#131c31);
+        --hm-art-opacity:.7;
+      }
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: #ffffff; }
+      body { background: var(--hm-bg); }
     </style>
   </head>
   <body>

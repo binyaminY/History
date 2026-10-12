@@ -9,14 +9,28 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
   const [openId, setOpenId] = useState(null);
   const [showAllQ, setShowAllQ] = useState(false);
   const closeRef = useRef(null);
+  const dialogRef = useRef(null);
 
   // Escape closes the window, and the close button gets the focus when it opens.
   useEffect(() => {
     if (!e) return;
-    const onKey = (ev) => { if (ev.key === "Escape") onClose(); };
+    const opener = document.activeElement;
+    // Escape closes; Tab stays inside the window while it is open.
+    const onKey = (ev) => {
+      if (ev.key === "Escape") { onClose(); return; }
+      if (ev.key !== "Tab" || !dialogRef.current) return;
+      const f = [...dialogRef.current.querySelectorAll('button:not([disabled]), a[href], input, [tabindex]:not([tabindex="-1"])')];
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+      else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+    };
     document.addEventListener("keydown", onKey);
     closeRef.current?.focus();
-    return () => document.removeEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      if (opener && typeof opener.focus === "function" && document.contains(opener)) opener.focus();
+    };
   }, [e?.id]);
 
   // Prepared questions for this topic load lazily; a click shows the answer right here.
@@ -38,14 +52,14 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
       position:"fixed", inset:0, background:"rgba(15,23,42,.55)", backdropFilter:"blur(6px)",
       zIndex:500, display:"flex", alignItems:"center", justifyContent:"center", padding:20,
     }}>
-      <div onClick={ev => ev.stopPropagation()} style={{
+      <div ref={dialogRef} onClick={ev => ev.stopPropagation()} style={{
         background:T.surface, border:`1px solid ${T.borderStrong}`,
         borderRadius:20, maxWidth:700, width:"100%", maxHeight:"90vh", overflowY:"auto",
         boxShadow:"0 24px 80px rgba(15,23,42,.25)",
       }}>
         {/* Header */}
         <div style={{
-          background:"linear-gradient(135deg, #dbeafe, #eff6ff)",
+          background:T.modalHead,
           borderBottom:`1px solid ${T.borderStrong}`,
           padding:"28px 28px 22px",
           borderRadius:"20px 20px 0 0",
@@ -53,7 +67,7 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:10 }}>
             <div style={{ flex:1 }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8, flexWrap:"wrap" }}>
-                <span style={{ fontSize:".68rem", color:T.gold, fontWeight:600, letterSpacing:".12em", textTransform:"uppercase", background:"rgba(37,99,235,.1)", padding:"3px 10px", borderRadius:20, border:`1px solid ${T.borderStrong}` }}>{e.era}</span>
+                <span style={{ fontSize:".68rem", color:T.gold, fontWeight:600, letterSpacing:".12em", textTransform:"uppercase", background:T.accentSoft, padding:"3px 10px", borderRadius:20, border:`1px solid ${T.borderStrong}` }}>{e.era}</span>
                 {e.tags.map(tag => (
                   <span key={tag} style={{ fontSize:".62rem", padding:"2px 8px", borderRadius:20, background:T.surface3, color:T.textMuted, border:`1px solid ${T.border}` }}>{tagLabel(lang, tag)}</span>
                 ))}
@@ -89,7 +103,7 @@ export default function EventModal({ event: e, lang, isHe, onClose, onSave, onAs
               <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                 {(showAllQ ? questions : questions.slice(0, 6)).map(q => (
                   <button key={q.id} type="button" onClick={() => setOpenId(id => id === q.id ? null : q.id)} style={{
-                    background: openId === q.id ? T.gold : T.surface, color: openId === q.id ? "#ffffff" : T.gold,
+                    background: openId === q.id ? T.gold : T.surface, color: openId === q.id ? T.onAccent : T.gold,
                     border:`1px solid ${T.borderStrong}`, borderRadius:18, padding:"7px 13px", fontSize:".8rem",
                     cursor:"pointer", fontFamily:"inherit", textAlign: isHe ? "right" : "left",
                   }}>{q.q}</button>

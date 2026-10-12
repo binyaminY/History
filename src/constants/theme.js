@@ -1,18 +1,29 @@
+// Every colour is a CSS variable, so the whole app switches between light and dark
+// by changing data-theme on <html>. The values live in index.html (:root / [data-theme="dark"]).
 const T = {
-  bg: "#ffffff",
-  surface: "#f8f8f8",
-  surface2: "#f0f0f0",
-  surface3: "#e8e8e8",
-  gold: "#2563eb",
-  goldLight: "#3b82f6",
-  goldDim: "#1e40af",
-  text: "#4b5563",
-  textDim: "#585f6b",
-  textMuted: "#6b7280",
-  red: "#dc2626",
-  green: "#16a34a",
-  border: "rgba(37,99,235,0.12)",
-  borderStrong: "rgba(37,99,235,0.25)",
+  bg: "var(--hm-bg)",
+  surface: "var(--hm-surface)",
+  surface2: "var(--hm-surface2)",
+  surface3: "var(--hm-surface3)",
+  gold: "var(--hm-accent)",
+  goldLight: "var(--hm-accent-light)",
+  goldDim: "var(--hm-accent-dim)",
+  onAccent: "var(--hm-on-accent)",
+  accentSoft: "var(--hm-accent-soft)",
+  text: "var(--hm-text)",
+  textDim: "var(--hm-text-dim)",
+  textMuted: "var(--hm-text-muted)",
+  red: "var(--hm-red)",
+  redSoft: "var(--hm-red-soft)",
+  green: "var(--hm-green)",
+  greenSoft: "var(--hm-green-soft)",
+  border: "var(--hm-border)",
+  borderStrong: "var(--hm-border-strong)",
+  navBg: "var(--hm-nav-bg)",
+  logo: "var(--hm-logo)",
+  modalHead: "var(--hm-modal-head)",
 };
+
+export const isDark = () => typeof document !== "undefined" && document.documentElement.dataset.theme === "dark";
 
 export default T;

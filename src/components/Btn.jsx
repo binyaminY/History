@@ -7,9 +7,9 @@ export default function Btn({ onClick, disabled, children, variant = "primary", 
     transition:"all .2s", opacity: disabled ? .5 : 1, fontFamily:"inherit",
   };
   const styles = {
-    primary: { background: T.gold, color:"#ffffff" },
+    primary: { background: T.gold, color:T.onAccent },
     secondary: { background:"transparent", color:T.text, border:`1px solid ${T.borderStrong}` },
-    generate: { width:"100%", background:`linear-gradient(135deg,${T.gold},${T.goldDim})`, color:"#ffffff", borderRadius:11, padding:14, fontSize:".92rem", display:"flex", alignItems:"center", justifyContent:"center", gap:9 },
+    generate: { width:"100%", background:`linear-gradient(135deg,${T.gold},${T.goldDim})`, color:T.onAccent, borderRadius:11, padding:14, fontSize:".92rem", display:"flex", alignItems:"center", justifyContent:"center", gap:9 },
   };
   return <button onClick={onClick} disabled={disabled} style={{ ...base, ...styles[variant], ...extra }}>{children}</button>;
 }

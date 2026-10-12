@@ -105,8 +105,8 @@ export default function QuizScreen({ lang, events, onOpenEvent }) {
             <div style={{ fontSize:".95rem", fontWeight:700, color:T.text, lineHeight:1.6, marginBottom:14 }}>{a.question}</div>
             <div style={{ fontSize:".7rem", color:T.textMuted, fontWeight:700, marginBottom:4 }}>{tx.quizYourAnswer}</div>
             <div style={{ fontSize:".88rem", color:T.textDim, lineHeight:1.7, background:T.surface2, borderRadius:10, padding:"10px 12px", marginBottom:12 }}>{a.options[a.chosenIdx]}</div>
-            <div style={{ fontSize:".7rem", color:"#16a34a", fontWeight:700, marginBottom:4 }}>{tx.quizIdealAnswer}</div>
-            <div style={{ fontSize:".88rem", color:T.text, lineHeight:1.7, background:"rgba(22,163,74,.08)", border:"1px solid rgba(22,163,74,.25)", borderRadius:10, padding:"10px 12px" }}>{a.options[a.correctIdx]}</div>
+            <div style={{ fontSize:".7rem", color:T.green, fontWeight:700, marginBottom:4 }}>{tx.quizIdealAnswer}</div>
+            <div style={{ fontSize:".88rem", color:T.text, lineHeight:1.7, background:T.greenSoft, border:`1px solid ${T.green}`, borderRadius:10, padding:"10px 12px" }}>{a.options[a.correctIdx]}</div>
           </div>
         ))}
       </div>
@@ -127,7 +127,7 @@ export default function QuizScreen({ lang, events, onOpenEvent }) {
             </div>
             <div style={{ fontSize:".68rem", color:T.textMuted }}>{tx.quizQuestion} {qNum + 1} {tx.quizOf} {total}</div>
           </div>
-          <div style={{ background:"rgba(37,99,235,.15)", border:`1px solid ${T.borderStrong}`, borderRadius:20, padding:"4px 12px", fontSize:".8rem", color:T.gold, fontWeight:700, whiteSpace:"nowrap" }}>{score}/{maxScore}</div>
+          <div style={{ background:T.accentSoft, border:`1px solid ${T.borderStrong}`, borderRadius:20, padding:"4px 12px", fontSize:".8rem", color:T.gold, fontWeight:700, whiteSpace:"nowrap" }}>{score}/{maxScore}</div>
         </div>
 
         <div style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"1.1rem", color:T.gold, marginBottom:18, fontWeight:700 }}>{tx.quizOn}{e?.name}</div>
@@ -144,13 +144,13 @@ export default function QuizScreen({ lang, events, onOpenEvent }) {
           const showRight = answered && isCorrect;
           return (
             <button key={idx} onClick={() => selectOption(idx)} disabled={answered} style={{
-              width:"100%", background: showRight ? "rgba(76,168,106,.1)" : wrongChosen ? "rgba(201,76,76,.1)" : T.surface,
-              border:`1px solid ${showRight ? "#4ca86a" : wrongChosen ? T.red : T.border}`,
+              width:"100%", background: showRight ? T.greenSoft : wrongChosen ? T.redSoft : T.surface,
+              border:`1px solid ${showRight ? T.green : wrongChosen ? T.red : T.border}`,
               borderRadius:11, padding:"14px 18px", cursor: answered ? "default" : "pointer",
-              fontSize:".88rem", color: showRight ? "#4ca86a" : wrongChosen ? T.red : T.text, textAlign: isHe?"right":"left",
+              fontSize:".88rem", color: showRight ? T.green : wrongChosen ? T.red : T.text, textAlign: isHe?"right":"left",
               fontFamily:"inherit", lineHeight:1.5, display:"flex", alignItems:"center", gap:12, marginBottom:10, transition:"all .2s",
             }}>
-              <div style={{ width:26, height:26, borderRadius:"50%", background: showRight ? "#4ca86a" : wrongChosen ? T.red : T.surface3, border:`1px solid ${T.border}`, fontSize:".75rem", fontWeight:700, display:"grid", placeItems:"center", flexShrink:0, color: (showRight||wrongChosen) ? "#fff" : T.textMuted }}>{letters[idx]}</div>
+              <div style={{ width:26, height:26, borderRadius:"50%", background: showRight ? T.green : wrongChosen ? T.red : T.surface3, border:`1px solid ${T.border}`, fontSize:".75rem", fontWeight:700, display:"grid", placeItems:"center", flexShrink:0, color: (showRight||wrongChosen) ? T.onAccent : T.textMuted }}>{letters[idx]}</div>
               <span>{opt}</span>
             </button>
           );
@@ -160,7 +160,7 @@ export default function QuizScreen({ lang, events, onOpenEvent }) {
           <>
             <div style={{ background:T.surface, border:`1px solid ${T.borderStrong}`, borderRadius:14, padding:"20px 22px", marginTop:8 }}>
               <div style={{ fontSize:"1.8rem", marginBottom:8 }}>{chosen === q.correct ? "✅" : "❌"}</div>
-              <div style={{ fontSize:"1rem", fontWeight:700, marginBottom:10, color: chosen === q.correct ? "#4ca86a" : T.red }}>{chosen === q.correct ? tx.quizCorrect : tx.quizWrong}</div>
+              <div style={{ fontSize:"1rem", fontWeight:700, marginBottom:10, color: chosen === q.correct ? T.green : T.red }}>{chosen === q.correct ? tx.quizCorrect : tx.quizWrong}</div>
               <div style={{ color:T.textDim, fontSize:".87rem", lineHeight:1.75 }}>{q.explanation}</div>
             </div>
             <Btn onClick={next} variant="generate" style={{ marginTop:16 }}>{isLastQ ? tx.quizFinish : tx.quizNext}</Btn>

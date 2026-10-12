@@ -103,6 +103,29 @@ export default function App() {
     document.documentElement.dir = isHe ? "rtl" : "ltr";
   }, [lang, isHe]);
 
+  // Light / dark: a saved choice wins, otherwise follow the system until the user picks one.
+  const [theme, setThemeState] = useState(() => document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+  const applyTheme = (t) => {
+    document.documentElement.dataset.theme = t;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", t === "dark" ? "#0b1220" : "#2563eb");
+    setThemeState(t);
+  };
+  const toggleTheme = () => {
+    const t = theme === "dark" ? "light" : "dark";
+    applyTheme(t);
+    try { localStorage.setItem("hm_theme", t); } catch {}
+  };
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = (ev) => {
+      let stored = null;
+      try { stored = localStorage.getItem("hm_theme"); } catch {}
+      if (!stored) applyTheme(ev.matches ? "dark" : "light");
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   useEffect(() => {
     document.documentElement.style.fontSize = TEXT_SIZES[sizeIdx] + "%";
     try { localStorage.setItem("hm_text_size", String(sizeIdx)); } catch {}
@@ -144,23 +167,30 @@ export default function App() {
       minHeight:"100vh", display:"flex", flexDirection:"column",
       direction: isHe ? "rtl" : "ltr", position:"relative",
     }}>
+      <a href="#main" className="hm-skip" onClick={ev => { ev.preventDefault(); document.getElementById("main")?.focus(); }}>{isHe ? "דלג לתוכן הראשי" : "Skip to main content"}</a>
       <BackgroundArt />
       <style>{`
         @keyframes hm-spin { to { transform: rotate(360deg); } }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: rgba(37,99,235,.35); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--hm-border-strong); border-radius: 3px; }
         button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         input, textarea, select { font-size: 16px; }
-        :focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+        :focus-visible { outline: 3px solid var(--hm-accent); outline-offset: 2px; }
+        .hm-skip { position: absolute; top: -60px; inset-inline-start: 12px; z-index: 1000; background: var(--hm-accent); color: var(--hm-on-accent); padding: 10px 16px; border-radius: 10px; font-weight: 700; text-decoration: none; }
+        .hm-skip:focus { top: 8px; }
+        .hm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+        }
         @media (max-width: 640px) {
           .hm-nav { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; position: static !important; padding-top: max(10px, env(safe-area-inset-top)) !important; padding-bottom: 10px !important; }
           .hm-tabs {
             position: fixed !important; bottom: 0; left: 0; right: 0; z-index: 400;
             flex-wrap: nowrap !important; gap: 0 !important; border-radius: 0 !important;
             padding: 6px 4px calc(6px + env(safe-area-inset-bottom)) !important;
-            background: rgba(255,255,255,.98) !important; border: none !important; border-top: 1px solid #e2e8f0 !important;
-            box-shadow: 0 -6px 20px rgba(15,23,42,.08);
+            background: var(--hm-nav-bg) !important; border: none !important; border-top: 1px solid var(--hm-border-strong) !important;
+            box-shadow: 0 -6px 20px rgba(15,23,42,.12);
           }
           .hm-tabs button { flex: 1; padding: 9px 2px !important; font-size: .72rem !important; }
           html { scroll-padding-bottom: 90px; }
@@ -176,21 +206,21 @@ export default function App() {
         paddingInlineStart:"max(24px, calc(24px + env(safe-area-inset-left)))",
         paddingInlineEnd:"max(24px, calc(24px + env(safe-area-inset-right)))",
         borderBottom:`1px solid ${T.border}`,
-        background:"rgba(255,255,255,.98)", backdropFilter:"blur(20px)",
+        background:T.navBg, backdropFilter:"blur(20px)",
         position:"sticky", top:0, zIndex:100, flexWrap:"wrap", gap:8,
       }}>
         <button onClick={() => { setModal(null); go("home"); setChatTopic(null); }}
           aria-label={isHe ? "חזרה לדף הבית" : "Back to home"}
           style={{ display:"flex", alignItems:"center", gap:10, background:"none", border:"none", padding:0, cursor:"pointer", fontFamily:"inherit" }}>
           <img src={logoMark} alt="" aria-hidden="true" style={{ height:40, width:"auto", display:"block" }} />
-          <span style={{ fontFamily:"Georgia,'Times New Roman',serif", fontSize:"1.3rem", fontWeight:600, color:"#1e3a5f", letterSpacing:"-.01em" }}>history with ben</span>
+          <span style={{ fontFamily:"Georgia,'Times New Roman',serif", fontSize:"1.3rem", fontWeight:600, color:T.logo, letterSpacing:"-.01em" }}>history with ben</span>
         </button>
         <div className="hm-tabs" style={{ display:"flex", gap:3, background:T.surface2, border:`1px solid ${T.border}`, borderRadius:11, padding:3, flexWrap:"wrap", justifyContent:"center" }}>
           {navTabs.map(tab => (
-            <button key={tab.id} onClick={() => { go(tab.id); setChatTopic(null); }} style={{
+            <button key={tab.id} aria-current={screen===tab.id ? "page" : undefined} onClick={() => { go(tab.id); setChatTopic(null); }} style={{
               padding:"6px 13px", borderRadius:8, border:"none",
               background: screen===tab.id ? T.gold : "transparent",
-              color: screen===tab.id ? "#ffffff" : T.textDim,
+              color: screen===tab.id ? T.onAccent : T.textDim,
               cursor:"pointer", fontSize:".8rem", fontWeight: screen===tab.id ? 700 : 500,
               transition:"all .2s", whiteSpace:"nowrap", fontFamily:"inherit",
             }}>{tab.label}</button>
@@ -199,7 +229,7 @@ export default function App() {
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <a href={PROMO_URL} target="_blank" rel="noopener noreferrer" aria-label={tx.promoAria} style={{
             display:"inline-flex", alignItems:"center", gap:6, whiteSpace:"nowrap",
-            background:T.gold, color:"#ffffff", borderRadius:20, padding:"6px 14px",
+            background:T.gold, color:T.onAccent, borderRadius:20, padding:"6px 14px",
             fontSize:".79rem", fontWeight:700, textDecoration:"none", fontFamily:"inherit",
           }}>
             <span aria-hidden="true">▶</span>{tx.promo}
@@ -218,18 +248,25 @@ export default function App() {
               fontSize:"1.02rem", fontWeight:700, fontFamily:"inherit",
             }}>A+</button>
           </div>
-          <button onClick={() => setLang(l => l==="he"?"en":"he")} style={{
+          <button onClick={toggleTheme} aria-pressed={theme === "dark"}
+            aria-label={isHe ? "מצב כהה" : "Dark mode"} title={isHe ? "מצב כהה" : "Dark mode"} style={{
+            background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20, width:36, height:32,
+            fontSize:"1rem", color:T.gold, cursor:"pointer", fontFamily:"inherit", display:"grid", placeItems:"center",
+          }}><span aria-hidden="true">{theme === "dark" ? "☀️" : "🌙"}</span></button>
+          <button onClick={() => setLang(l => l==="he"?"en":"he")} lang={isHe ? "en" : "he"} style={{
             background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:20,
             padding:"5px 13px", fontSize:".79rem", color:T.gold, cursor:"pointer", fontFamily:"inherit",
           }}>{tx.langToggle}</button>
         </div>
       </nav>
 
+      <main id="main" tabIndex={-1} style={{ flex:1, display:"flex", flexDirection:"column", outline:"none", position:"relative", zIndex:1 }}>
       {screen === "home" && <HomeScreen lang={lang} events={events} level={level} onOpenEvent={openModal} />}
       {screen === "timeline" && <TimelineScreen lang={lang} events={events} level={level} onOpenEvent={openModal} />}
       {screen === "chat" && <ChatScreen key={lang + (chatTopic?.id || "")} lang={lang} topic={chatTopic && { ...chatTopic, name: events.find(x => x.id === chatTopic.id)?.name || chatTopic.name }} onClearTopic={() => setChatTopic(null)} events={events} startItem={startItem} onStartConsumed={() => setStartItem(null)} />}
       {screen === "saved" && <SavedScreen lang={lang} events={events} saved={saved} onRemove={removeItem} />}
       {screen === "quiz" && <QuizScreen lang={lang} events={events} onOpenEvent={openModal} />}
+      </main>
 
       {modalEvent && (
         <EventModal
@@ -250,7 +287,8 @@ export default function App() {
         onOpenChat={() => { setChatTopic(null); go("chat"); }}
       />
 
-      {toast && <div className="hm-toast" style={{
+      <div className="hm-sr" role="status" aria-live="polite">{toast}</div>
+      {toast && <div className="hm-toast" aria-hidden="true" style={{
         position:"fixed", bottom:90, left:"50%", transform:"translateX(-50%)",
         background:T.surface3, border:`1px solid ${T.borderStrong}`, borderRadius:10,
         padding:"9px 17px", fontSize:".82rem", color:T.text, zIndex:999, whiteSpace:"nowrap",

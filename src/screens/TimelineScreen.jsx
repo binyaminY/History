@@ -1,5 +1,5 @@
 import { useState } from "react";
-import T from "../constants/theme";
+import T, { isDark } from "../constants/theme";
 import TX, { tagLabel } from "../constants/translations";
 import { LEVEL_ORDER } from "../constants/events";
 
@@ -18,6 +18,11 @@ const ERA_COLORS = {
   "19th Century": "#2563eb",
   "20th Century": "#dc2626",
   "21st Century": "#0891b2",
+};
+
+const DARK_SHIFT = {
+  "#b45309": "#fbbf24", "#7c3aed": "#a78bfa", "#db2777": "#f472b6", "#16a34a": "#4ade80",
+  "#2563eb": "#60a5fa", "#dc2626": "#f87171", "#0891b2": "#22d3ee",
 };
 
 function extractSortYear(yearStr) {
@@ -76,7 +81,7 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
             <button key={f.k} onClick={() => setFilter(f.k)} style={{
               padding:"6px 14px", borderRadius:20, fontFamily:"inherit",
               border:`1px solid ${filter===f.k ? T.gold : T.border}`,
-              background: filter===f.k ? "rgba(37,99,235,.12)" : "transparent",
+              background: filter===f.k ? T.accentSoft : "transparent",
               color: filter===f.k ? T.gold : T.textDim,
               fontSize:".78rem", cursor:"pointer", fontWeight: filter===f.k ? 700 : 400,
               transition:"all .2s",
@@ -87,7 +92,8 @@ export default function TimelineScreen({ lang, events, level, onOpenEvent }) {
         {/* Timeline grouped by era */}
         {sortedEras.map(era => {
           const eraEvents = grouped[era];
-          const eraColor = ERA_COLORS[era] || T.gold;
+          const baseColor = ERA_COLORS[era] || "#2563eb";
+          const eraColor = isDark() ? (DARK_SHIFT[baseColor] || baseColor) : baseColor;
           return (
             <div key={era} style={{ marginBottom:40 }}>
               <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>

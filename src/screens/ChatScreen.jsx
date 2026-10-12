@@ -120,7 +120,7 @@ export default function ChatScreen({ lang, topic = null, onClearTopic, events = 
   return (
     <div style={{ flex:1, display:"flex", flexDirection:"column", minHeight:0, overflow:"hidden" }}>
       {topic && (
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, padding:"10px 20px", background:"rgba(37,99,235,.08)", borderBottom:`1px solid ${T.border}`, flexWrap:"wrap" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, padding:"10px 20px", background:T.accentSoft, borderBottom:`1px solid ${T.border}`, flexWrap:"wrap" }}>
           <div style={{ fontSize:".85rem", color:T.text }}>
             📌 {tx.topicLabel} <strong style={{ color:T.gold }}>{topic.name}</strong>
           </div>
@@ -168,7 +168,7 @@ export default function ChatScreen({ lang, topic = null, onClearTopic, events = 
             <div style={{
               padding:"12px 16px", fontSize:".9rem", lineHeight:1.75,
               background: msg.role==="user" ? T.gold : T.surface,
-              color: msg.role==="user" ? "#ffffff" : (msg.error ? T.red : T.text),
+              color: msg.role==="user" ? T.onAccent : (msg.error ? T.red : T.text),
               border: msg.role==="ai" ? `1px solid ${T.border}` : "none",
               borderRadius: msg.role==="user"
                 ? (isHe ? "15px 15px 15px 4px" : "15px 15px 4px 15px")
@@ -203,7 +203,7 @@ export default function ChatScreen({ lang, topic = null, onClearTopic, events = 
         )}
         <div style={{ display:"flex", gap:8, alignItems:"center", background:T.surface2, border:`1px solid ${T.borderStrong}`, borderRadius:12, padding:"7px 10px", maxWidth:640, margin:"0 auto" }}>
           <button onClick={() => send()} disabled={loading || !input.trim()} aria-label={tx.send}
-            style={{ background:T.gold, color:"#ffffff", border:"none", borderRadius:8, width:40, height:40, minWidth:40, cursor: loading || !input.trim() ? "default" : "pointer", opacity: loading || !input.trim() ? .5 : 1, display:"grid", placeItems:"center", flexShrink:0, fontSize:"1rem", order: isHe ? 1 : 0 }}>
+            style={{ background:T.gold, color:T.onAccent, border:"none", borderRadius:8, width:40, height:40, minWidth:40, cursor: loading || !input.trim() ? "default" : "pointer", opacity: loading || !input.trim() ? .5 : 1, display:"grid", placeItems:"center", flexShrink:0, fontSize:"1rem", order: isHe ? 1 : 0 }}>
             {isHe ? "◄" : "►"}
           </button>
           <textarea

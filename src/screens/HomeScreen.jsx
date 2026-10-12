@@ -58,7 +58,7 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
           {[["all", tx.allEras], ...eras.map(x => [x, x])].map(([key, label]) => (
             <button key={key} onClick={() => setEra(key)} aria-pressed={era === key} style={{
               flexShrink:0, padding:"6px 14px", fontSize:".78rem", fontFamily:"inherit", cursor:"pointer", borderRadius:20,
-              background: era === key ? T.gold : T.surface, color: era === key ? "#ffffff" : T.textDim,
+              background: era === key ? T.gold : T.surface, color: era === key ? T.onAccent : T.textDim,
               border:`1px solid ${era === key ? T.gold : T.borderStrong}`, fontWeight: era === key ? 700 : 500, whiteSpace:"nowrap",
             }}>{label}</button>
           ))}
