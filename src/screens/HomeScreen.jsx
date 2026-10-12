@@ -21,19 +21,39 @@ export default function HomeScreen({ lang, events, level, onOpenEvent }) {
   return (
     <div style={{ flex:1, overflowY:"auto" }}>
       <div style={{
-        background:"linear-gradient(135deg,#ffffff,#f3f4f6 50%,#ffffff)",
-        borderBottom:`1px solid ${T.border}`, padding:"48px 28px 32px", textAlign:"center",
+        position:"relative", overflow:"hidden", textAlign:"center",
+        padding:"clamp(44px,8vw,88px) 24px clamp(40px,7vw,64px)",
+        background:"radial-gradient(700px 300px at 50% 0%,rgba(59,130,246,.35),transparent 65%),linear-gradient(180deg,#0b1220,#111c36)",
+        color:"#e5eaf5",
       }}>
-        <h1 style={{ fontFamily:"'Comfortaa',sans-serif", fontSize:"clamp(1.7rem,5vw,3rem)", fontWeight:900, marginBottom:10, lineHeight:1.18 }}>
-          {tx.heroTitle}<br /><em style={{ color:T.gold }}>{tx.heroTitleEm}</em>
-        </h1>
-        <div style={{ display:"inline-block", background:"rgba(37,99,235,.12)", border:`1px solid ${T.borderStrong}`, color:T.gold, fontSize:".78rem", fontWeight:600, padding:"5px 16px", borderRadius:20, marginBottom:14, letterSpacing:".04em" }}>
-          {tx.heroTag}
+        <div aria-hidden="true" style={{
+          position:"absolute", left:0, right:0, bottom:26, height:1,
+          background:"linear-gradient(90deg,transparent,rgba(148,163,184,.45),transparent)",
+        }} />
+        <div aria-hidden="true" style={{ position:"absolute", left:"8%", right:"8%", bottom:21, display:"flex", justifyContent:"space-between", pointerEvents:"none" }}>
+          {[0,1,2,3,4,5,6].map(i => (
+            <span key={i} style={{ width:i % 3 === 0 ? 11 : 7, height:i % 3 === 0 ? 11 : 7, marginTop:i % 3 === 0 ? -1 : 1, borderRadius:"50%", background:i % 3 === 0 ? "#fbbf24" : "rgba(148,163,184,.7)", boxShadow:i % 3 === 0 ? "0 0 14px rgba(251,191,36,.7)" : "none" }} />
+          ))}
         </div>
-        <p style={{ color:T.textDim, fontSize:".9rem", maxWidth:460, margin:"0 auto 0", lineHeight:1.7 }}>{tx.heroSub}</p>
-        <p style={{ color:T.textDim, fontSize:".88rem", marginTop:16 }}>
-          {tx.createdBy}
-        </p>
+        <div style={{ position:"relative", maxWidth:760, margin:"0 auto", paddingBottom:30 }}>
+          <h1 style={{
+            fontFamily:"'Rubik','Heebo','Comfortaa',sans-serif", fontSize:"clamp(2.2rem,7vw,4.2rem)",
+            fontWeight:800, lineHeight:1.1, letterSpacing:"-.02em", marginBottom:20, color:"#ffffff",
+          }}>
+            {tx.heroTitle}<br />
+            <span style={{ color:"#fbbf24" }}>{tx.heroTitleEm}</span>
+          </h1>
+          <p style={{ color:"#b6c2dc", fontSize:"clamp(.95rem,2.2vw,1.1rem)", maxWidth:520, margin:"0 auto", lineHeight:1.75 }}>{tx.heroSub}</p>
+          <div style={{ display:"flex", justifyContent:"center", gap:12, marginTop:28, flexWrap:"wrap" }}>
+            {[[events.length, isHe ? "נושאים" : "Topics"], [eras.length, isHe ? "תקופות" : "Eras"]].map(([n, label]) => (
+              <div key={label} style={{ display:"flex", alignItems:"baseline", gap:8, padding:"8px 18px", borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)" }}>
+                <span style={{ fontFamily:"'Rubik','Heebo',sans-serif", fontSize:"1.4rem", fontWeight:800, color:"#ffffff" }}>{n}</span>
+                <span style={{ fontSize:".82rem", color:"#9fb0d0" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+          <p style={{ color:"#7f8fb0", fontSize:".78rem", marginTop:22 }}>{tx.createdBy}</p>
+        </div>
       </div>
 
       <div style={{ padding:"24px 28px", maxWidth:1040, margin:"0 auto" }}>
